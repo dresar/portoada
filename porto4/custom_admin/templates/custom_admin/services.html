@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Service model
+    window.templateFields = ['title', 'description', 'icon', 'price', 'duration', 'is_active', 'display_order'];
+</script>
+{% endblock %}

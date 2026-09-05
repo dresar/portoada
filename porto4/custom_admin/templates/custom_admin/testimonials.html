@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Testimonial model
+    window.templateFields = ['user', 'client_name', 'client_position', 'client_company', 'content', 'rating', 'client_image', 'is_featured', 'date_given'];
+</script>
+{% endblock %}

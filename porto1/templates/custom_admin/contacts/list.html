@@ -1,0 +1,526 @@
+{% extends 'custom_admin/layouts/base.html' %}
+
+{% block title %}Daftar Kontak - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                            <i class="fas fa-home mr-2.5"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-400 dark:text-gray-500">Kontak</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Daftar Kontak</h1>
+        </div>
+        <div class="sm:flex">
+            <div class="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0 dark:divide-gray-700">
+                <form class="lg:pr-3" action="#" method="GET">
+                    <label for="search" class="sr-only">Search</label>
+                    <div class="relative mt-1 lg:w-64 xl:w-96">
+                        <input type="text" name="search" id="search" value="{{ search }}" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Cari kontak">
+                        <button type="submit" class="absolute top-0 right-0 p-2.5 text-sm font-medium text-white bg-primary-700 rounded-r-lg border border-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            <i class="fas fa-search"></i>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </div>
+                </form>
+                <div class="flex pl-0 mt-3 space-x-1 sm:pl-2 sm:mt-0">
+                    <a href="?" class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <i class="fas fa-redo"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+                <button type="button" id="mark-all-read-btn" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 sm:w-auto dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                    <i class="fas fa-check-double mr-2"></i>
+                    Tandai Semua Dibaca
+                </button>
+                <button type="button" id="delete-all-btn" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 sm:w-auto dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    Hapus Semua
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flex flex-col">
+    <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600">
+                    <thead class="bg-gray-100 dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="p-4">
+                                <div class="flex items-center">
+                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox" class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+                                    <label for="checkbox-all" class="sr-only">checkbox</label>
+                                </div>
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Nama
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Email
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Subjek
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Tanggal
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                Status
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium text-center text-gray-500 uppercase dark:text-gray-400">
+                                Aksi
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                        {% for contact in contacts %}
+                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 {% if contact.status == 'new' %}font-semibold{% endif %}">
+                            <td class="p-4 w-4">
+                                <div class="flex items-center">
+                                    <input id="checkbox-{{ contact.id }}" aria-describedby="checkbox-1" type="checkbox" class="contact-checkbox w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" data-id="{{ contact.id }}">
+                                    <label for="checkbox-{{ contact.id }}" class="sr-only">checkbox</label>
+                                </div>
+                            </td>
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ contact.name }}
+                            </td>
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <a href="mailto:{{ contact.email }}" class="text-primary-600 dark:text-primary-500 hover:underline">{{ contact.email }}</a>
+                            </td>
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ contact.subject|truncatechars:30 }}
+                            </td>
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ contact.created_at|date:"d M Y, H:i" }}
+                            </td>
+                            <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {% if contact.status == 'read' %}
+                                <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                                    <i class="fas fa-check-double mr-1"></i> Dibaca
+                                </span>
+                                {% else %}
+                                <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                                    <i class="fas fa-envelope mr-1"></i> Belum Dibaca
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="p-4 space-x-2 whitespace-nowrap text-center">
+                                <button type="button" data-modal-target="contact-detail-modal" data-modal-toggle="contact-detail-modal" data-id="{{ contact.id }}" data-name="{{ contact.name }}" data-email="{{ contact.email }}" data-subject="{{ contact.subject }}" data-message="{{ contact.message }}" data-created="{{ contact.created_at|date:'d M Y, H:i' }}" data-read="{{ contact.status == 'read' }}" class="view-contact-btn inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    <i class="fas fa-eye mr-2"></i>
+                                    Lihat
+                                </button>
+                                <button type="button" data-id="{{ contact.id }}" data-name="{{ contact.name }}" class="delete-contact-btn inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900">
+                                    <i class="fas fa-trash-alt mr-2"></i>
+                                    Hapus
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-inbox text-4xl mb-2"></i>
+                                <p>Tidak ada kontak yang ditemukan.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if contacts.has_other_pages %}
+<div class="sticky bottom-0 right-0 items-center w-full p-4 bg-white border-t border-gray-200 sm:flex sm:justify-between dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex items-center mb-4 sm:mb-0">
+        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+            Menampilkan <span class="font-semibold text-gray-900 dark:text-white">{{ contacts.start_index }}</span> - <span class="font-semibold text-gray-900 dark:text-white">{{ contacts.end_index }}</span> dari <span class="font-semibold text-gray-900 dark:text-white">{{ paginator.count }}</span>
+        </span>
+    </div>
+    <div class="flex items-center space-x-3">
+        {% if contacts.has_previous %}
+        <a href="?page={{ contacts.previous_page_number }}{% if search %}&search={{ search }}{% endif %}" class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            <i class="fas fa-angle-left mr-1"></i>
+            Previous
+        </a>
+        {% else %}
+        <button disabled class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-400 cursor-not-allowed dark:bg-primary-800">
+            <i class="fas fa-angle-left mr-1"></i>
+            Previous
+        </button>
+        {% endif %}
+        {% if contacts.has_next %}
+        <a href="?page={{ contacts.next_page_number }}{% if search %}&search={{ search }}{% endif %}" class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            Next
+            <i class="fas fa-angle-right ml-1"></i>
+        </a>
+        {% else %}
+        <button disabled class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-400 cursor-not-allowed dark:bg-primary-800">
+            Next
+            <i class="fas fa-angle-right ml-1"></i>
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Contact Detail Modal -->
+<div id="contact-detail-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 items-center justify-center hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="contact-detail-subject">
+                    Detail Pesan
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="contact-detail-modal">
+                    <i class="fas fa-times"></i>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 sm:col-span-1">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Nama</p>
+                        <p class="text-base font-semibold text-gray-900 dark:text-white" id="contact-detail-name"></p>
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
+                        <p class="text-base font-semibold text-gray-900 dark:text-white">
+                            <a href="#" id="contact-detail-email" class="text-primary-600 dark:text-primary-500 hover:underline"></a>
+                        </p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal</p>
+                        <p class="text-base font-semibold text-gray-900 dark:text-white" id="contact-detail-date"></p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pesan</p>
+                        <div class="p-4 bg-gray-50 rounded-lg dark:bg-gray-600 mt-2">
+                            <p class="text-base text-gray-900 dark:text-white whitespace-pre-line" id="contact-detail-message"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <button type="button" id="contact-detail-reply" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <i class="fas fa-reply mr-2"></i>Balas Email
+                </button>
+                <button type="button" data-modal-hide="contact-detail-modal" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    <i class="fas fa-times mr-2"></i>Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Contact Confirmation Modal -->
+<div id="delete-contact-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="delete-contact-modal">
+                <i class="fas fa-times"></i>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="p-6 text-center">
+                <i class="fas fa-exclamation-triangle text-5xl text-yellow-400 mb-4"></i>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Apakah Anda yakin ingin menghapus pesan dari <span id="delete-contact-name" class="font-semibold text-gray-900 dark:text-white"></span>?</h3>
+                <button type="button" id="confirm-delete-contact" data-id="" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                    <i class="fas fa-trash-alt mr-2"></i>Ya, hapus
+                </button>
+                <button data-modal-hide="delete-contact-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    <i class="fas fa-times mr-2"></i>Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete All Contacts Confirmation Modal -->
+<div id="delete-all-contacts-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="delete-all-contacts-modal">
+                <i class="fas fa-times"></i>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="p-6 text-center">
+                <i class="fas fa-exclamation-triangle text-5xl text-yellow-400 mb-4"></i>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Apakah Anda yakin ingin menghapus semua pesan?</h3>
+                <button type="button" id="confirm-delete-all-contacts" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                    <i class="fas fa-trash-alt mr-2"></i>Ya, hapus semua
+                </button>
+                <button data-modal-hide="delete-all-contacts-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    <i class="fas fa-times mr-2"></i>Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // View Contact Detail
+        const viewContactButtons = document.querySelectorAll('.view-contact-btn');
+        viewContactButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                const email = this.getAttribute('data-email');
+                const subject = this.getAttribute('data-subject');
+                const message = this.getAttribute('data-message');
+                const created = this.getAttribute('data-created');
+                const isRead = this.getAttribute('data-read') === 'True';
+                
+                // Fill modal with contact details
+                document.getElementById('contact-detail-name').textContent = name;
+                document.getElementById('contact-detail-email').textContent = email;
+                document.getElementById('contact-detail-email').href = `mailto:${email}`;
+                document.getElementById('contact-detail-subject').textContent = subject;
+                document.getElementById('contact-detail-message').textContent = message;
+                document.getElementById('contact-detail-date').textContent = created;
+                
+                // Set reply button email
+                document.getElementById('contact-detail-reply').setAttribute('data-email', email);
+                
+                // Mark as read if not already read
+                if (!isRead) {
+                    markAsRead(id);
+                }
+            });
+        });
+        
+        // Reply to Email
+        document.getElementById('contact-detail-reply').addEventListener('click', function() {
+            const email = this.getAttribute('data-email');
+            window.location.href = `mailto:${email}`;
+        });
+        
+        // Delete Contact
+        const deleteButtons = document.querySelectorAll('.delete-contact-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                
+                // Set modal data
+                document.getElementById('delete-contact-name').textContent = name;
+                document.getElementById('confirm-delete-contact').setAttribute('data-id', id);
+                
+                // Show modal
+                const modal = document.getElementById('delete-contact-modal');
+                const modalInstance = new Modal(modal);
+                modalInstance.show();
+            });
+        });
+        
+        // Confirm Delete Contact
+        document.getElementById('confirm-delete-contact').addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            deleteContact(id);
+        });
+        
+        // Delete All Contacts
+        document.getElementById('delete-all-btn').addEventListener('click', function() {
+            // Show confirmation modal
+            const modal = document.getElementById('delete-all-contacts-modal');
+            const modalInstance = new Modal(modal);
+            modalInstance.show();
+        });
+        
+        // Confirm Delete All Contacts
+        document.getElementById('confirm-delete-all-contacts').addEventListener('click', function() {
+            deleteAllContacts();
+        });
+        
+        // Mark All as Read
+        document.getElementById('mark-all-read-btn').addEventListener('click', function() {
+            markAllAsRead();
+        });
+        
+        // Checkbox select all
+        const checkboxAll = document.getElementById('checkbox-all');
+        if (checkboxAll) {
+            checkboxAll.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.contact-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+        }
+    });
+    
+    // Mark contact as read
+    function markAsRead(id) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`{% url 'custom_admin:contact_mark_read' 0 %}`.replace('0', id), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update UI to show as read
+                const row = document.querySelector(`input[data-id="${id}"]`).closest('tr');
+                row.classList.remove('font-semibold');
+                
+                // Update status badge
+                const statusCell = row.querySelector('td:nth-child(6)');
+                statusCell.innerHTML = `
+                    <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                        <i class="fas fa-check-double mr-1"></i> Dibaca
+                    </span>
+                `;
+            } else {
+                showToast('error', data.message || 'Gagal menandai pesan sebagai dibaca');
+            }
+        })
+        .catch(error => {
+            console.error('Error marking as read:', error);
+            showToast('error', 'Terjadi kesalahan saat menandai pesan sebagai dibaca');
+        });
+    }
+    
+    // Mark all contacts as read
+    function markAllAsRead() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`{% url 'custom_admin:contact_mark_all_read' %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast('success', data.message || 'Semua pesan telah ditandai sebagai dibaca');
+                
+                // Update UI
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast('error', data.message || 'Gagal menandai semua pesan sebagai dibaca');
+            }
+        })
+        .catch(error => {
+            console.error('Error marking all as read:', error);
+            showToast('error', 'Terjadi kesalahan saat menandai semua pesan sebagai dibaca');
+        });
+    }
+    
+    // Delete contact
+    function deleteContact(id) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`{% url 'custom_admin:contact_ajax_delete' 0 %}`.replace('0', id), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Close modal
+                const modal = document.getElementById('delete-contact-modal');
+                const modalInstance = Modal.getInstance(modal);
+                modalInstance.hide();
+                
+                // Show success message
+                showToast('success', data.message || 'Pesan berhasil dihapus');
+                
+                // Remove row from table
+                const row = document.querySelector(`input[data-id="${id}"]`).closest('tr');
+                row.remove();
+                
+                // Check if table is empty
+                const tbody = document.querySelector('tbody');
+                if (tbody.children.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-inbox text-4xl mb-2"></i>
+                                <p>Tidak ada kontak yang ditemukan.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } else {
+                showToast('error', data.message || 'Gagal menghapus pesan');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting contact:', error);
+            showToast('error', 'Terjadi kesalahan saat menghapus pesan');
+        });
+    }
+    
+    // Delete all contacts
+    function deleteAllContacts() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`{% url 'custom_admin:contact_delete_all' %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Close modal
+                const modal = document.getElementById('delete-all-contacts-modal');
+                const modalInstance = Modal.getInstance(modal);
+                modalInstance.hide();
+                
+                // Show success message
+                showToast('success', data.message || 'Semua pesan berhasil dihapus');
+                
+                // Reload page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast('error', data.message || 'Gagal menghapus semua pesan');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting all contacts:', error);
+            showToast('error', 'Terjadi kesalahan saat menghapus semua pesan');
+        });
+    }
+</script>
+{% endblock %}

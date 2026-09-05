@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if form.instance.id %}Edit Project{% else %}Add New Project{% endif %} - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+        
+        .preview-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .model-preview {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .dropzone {
+            border: 2px dashed #cbd5e0;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .dropzone:hover {
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">{% if form.instance.id %}Edit Project{% else %}Add New Project{% endif %}</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                            <i class="fas fa-home mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <a href="{% url 'custom_admin:project_list' %}" class="text-gray-700 hover:text-blue-600">
+                                Projects
+                            </a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-500">{% if form.instance.id %}Edit Project{% else %}Add New Project{% endif %}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <form method="post" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+                        <p class="font-bold">Please correct the following errors:</p>
+                        <ul class="list-disc pl-5">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Basic Information -->
+                        <div class="space-y-6">
+                            <h3 class="text-lg font-bold text-gray-800 border-b pb-2">Basic Information</h3>
+                            
+                            <div>
+                                <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
+                                <input type="text" name="title" id="id_title" value="{% if form.title.value %}{{ form.title.value }}{% endif %}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="Enter project title">
+                            </div>
+                            
+                            <div>
+                                <label for="id_category" class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
+                                <select name="category" id="id_category" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                    <option value="" {% if not form.category.value %}selected{% endif %}>Select a category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if form.category.value == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                    {% endfor %}
+                                    <option value="1" selected>Infrastructure</option>
+                                    <option value="2">Residential</option>
+                                    <option value="3">Commercial</option>
+                                    <option value="4">Industrial</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="id_status" class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+                                <select name="status" id="id_status" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                    <option value="" {% if not form.status.value %}selected{% endif %}>Select a status</option>
+                                    <option value="completed" {% if form.status.value == 'completed' %}selected{% endif %}>Completed</option>
+                                    <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="planning" {% if form.status.value == 'planning' %}selected{% endif %}>Planning</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="id_client" class="block text-sm font-medium text-gray-700 mb-1">Client</label>
+                                <input type="text" name="client" id="id_client" value="{% if form.client.value %}{{ form.client.value }}{% endif %}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="Enter client name">
+                            </div>
+                            
+                            <div>
+                                <label for="id_location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <input type="text" name="location" id="id_location" value="{% if form.location.value %}{{ form.location.value }}{% endif %}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="Enter project location">
+                            </div>
+                            
+                            <div>
+                                <label for="id_date" class="block text-sm font-medium text-gray-700 mb-1">Completion Date</label>
+                                <input type="date" name="date" id="id_date" value="{% if form.date.value %}{{ form.date.value|date:'Y-m-d' }}{% endif %}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                            </div>
+                            
+                            <div>
+                                <label for="id_url" class="block text-sm font-medium text-gray-700 mb-1">Project URL</label>
+                                <input type="url" name="url" id="id_url" value="{% if form.url.value %}{{ form.url.value }}{% endif %}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="https://example.com">
+                            </div>
+                        </div>
+                        
+                        <!-- Description and Media -->
+                        <div class="space-y-6">
+                            <h3 class="text-lg font-bold text-gray-800 border-b pb-2">Description and Media</h3>
+                            
+                            <div>
+                                <label for="id_description" class="block text-sm font-medium text-gray-700 mb-1">Description <span class="text-red-500">*</span></label>
+                                <textarea name="description" id="id_description" rows="5" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="Enter project description">{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="id_technologies" class="block text-sm font-medium text-gray-700 mb-1">Technologies Used</label>
+                                <input type="text" name="technologies" id="id_technologies" value="{% if form.technologies.value %}{{ form.technologies.value }}{% endif %}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="e.g. Concrete, Steel, BIM">
+                                <p class="text-xs text-gray-500 mt-1">Separate technologies with commas</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Featured Image <span class="text-red-500">*</span></label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                    <div class="space-y-1 text-center">
+                                        {% if form.instance.image %}
+                                        <div class="mb-3">
+                                            <img src="{{ form.instance.image.url }}" alt="Current image" class="mx-auto h-32 object-cover">
+                                        </div>
+                                        {% else %}
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        {% endif %}
+                                        <div class="flex text-sm text-gray-600">
+                                            <label for="id_image" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                <span>Upload a file</span>
+                                                <input id="id_image" name="image" type="file" class="sr-only" accept="image/*">
+                                            </label>
+                                            <p class="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Project Gallery</label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                    <div class="space-y-1 text-center">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label for="id_gallery" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                <span>Upload files</span>
+                                                <input id="id_gallery" name="gallery" type="file" class="sr-only" multiple accept="image/*">
+                                            </label>
+                                            <p class="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB (multiple files allowed)</p>
+                                    </div>
+                                </div>
+                                {% if form.instance.id and gallery_images %}
+                                <div class="mt-3 grid grid-cols-3 gap-3">
+                                    {% for image in gallery_images %}
+                                    <div class="relative">
+                                        <img src="{{ image.image.url }}" alt="Gallery image" class="h-20 w-full object-cover rounded">
+                                        <button type="button" class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2" onclick="removeGalleryImage({{ image.id }})">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="id_model_3d" class="block text-sm font-medium text-gray-700 mb-1">3D Model File (GLTF/GLB)</label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                    <div class="space-y-1 text-center">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label for="id_model_3d" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                <span>Upload a file</span>
+                                                <input id="id_model_3d" name="model_3d" type="file" class="sr-only" accept=".glb,.gltf">
+                                            </label>
+                                            <p class="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500">GLB or GLTF format up to 50MB</p>
+                                        {% if form.instance.model_3d %}
+                                        <p class="text-sm text-blue-600 mt-2">Current file: {{ form.instance.model_3d.name }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if form.instance.model_3d %}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">3D Model Preview</label>
+                                <div class="preview-container">
+                                    <div id="model-preview" class="model-preview"></div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between pt-6 border-t">
+                        <a href="{% url 'custom_admin:project_list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                            Cancel
+                        </a>
+                        
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition duration-300">
+                            {% if form.instance.id %}Update Project{% else %}Create Project{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Three.js for 3D model preview -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // File input preview for image
+        const imageInput = document.getElementById('id_image');
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'mx-auto h-32 object-cover';
+                        
+                        const container = imageInput.closest('div').parentElement;
+                        const existingImg = container.querySelector('img');
+                        const svg = container.querySelector('svg');
+                        
+                        if (existingImg) {
+                            existingImg.src = e.target.result;
+                        } else if (svg) {
+                            const div = document.createElement('div');
+                            div.className = 'mb-3';
+                            div.appendChild(img);
+                            container.insertBefore(div, svg);
+                            svg.style.display = 'none';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // 3D Model preview
+        {% if form.instance.model_3d %}
+        const modelPreview = document.getElementById('model-preview');
+        if (modelPreview) {
+            let scene, camera, renderer, controls, model;
+            
+            function initThree() {
+                // Create scene
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xf3f4f6);
+                
+                // Create camera
+                camera = new THREE.PerspectiveCamera(75, modelPreview.clientWidth / modelPreview.clientHeight, 0.1, 1000);
+                camera.position.z = 5;
+                
+                // Create renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(modelPreview.clientWidth, modelPreview.clientHeight);
+                renderer.outputEncoding = THREE.sRGBEncoding;
+                modelPreview.appendChild(renderer.domElement);
+                
+                // Add controls
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.25;
+                
+                // Add lights
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(1, 1, 1);
+                scene.add(directionalLight);
+                
+                // Load model
+                const loader = new THREE.GLTFLoader();
+                loader.load('{{ form.instance.model_3d.url }}', function(gltf) {
+                    model = gltf.scene;
+                    scene.add(model);
+                    
+                    // Center model
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+                    
+                    model.position.x -= center.x;
+                    model.position.y -= center.y;
+                    model.position.z -= center.z;
+                    
+                    // Adjust camera
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const fov = camera.fov * (Math.PI / 180);
+                    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                    cameraZ *= 1.5; // Add some margin
+                    camera.position.z = cameraZ;
+                    
+                    const minZ = box.min.z;
+                    const cameraToFarEdge = (minZ < 0) ? -minZ + cameraZ : cameraZ - minZ;
+                    camera.far = cameraToFarEdge * 3;
+                    camera.updateProjectionMatrix();
+                });
+                
+                // Animation loop
+                function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update();
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                
+                // Handle window resize
+                window.addEventListener('resize', onWindowResize, false);
+                function onWindowResize() {
+                    camera.aspect = modelPreview.clientWidth / modelPreview.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(modelPreview.clientWidth, modelPreview.clientHeight);
+                }
+            }
+            
+            initThree();
+        }
+        {% endif %}
+        
+        // Function to remove gallery image (would be implemented with AJAX in a real application)
+        function removeGalleryImage(imageId) {
+            if (confirm('Are you sure you want to remove this image?')) {
+                console.log('Removing image with ID:', imageId);
+                // In a real application, this would make an AJAX call to delete the image
+                // and then remove the element from the DOM upon success
+            }
+        }
+    </script>
+</body>
+</html>

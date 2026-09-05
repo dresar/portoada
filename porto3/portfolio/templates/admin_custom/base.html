@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %} - Portfolio Admin</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        .content-transition {
+            transition: margin-left 0.3s ease-in-out;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 dark:bg-gray-900" x-data="{ 
+    sidebarOpen: false, 
+    darkMode: localStorage.getItem('darkMode') === 'true',
+    toggleDarkMode() {
+        this.darkMode = !this.darkMode;
+        localStorage.setItem('darkMode', this.darkMode);
+        if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
+}" x-init="
+    if (darkMode) {
+        document.documentElement.classList.add('dark');
+    }
+">
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg sidebar-transition transform" 
+         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+        
+        <!-- Logo -->
+        <div class="flex items-center justify-center h-16 px-4 bg-indigo-600 dark:bg-indigo-700">
+            <h1 class="text-xl font-bold text-white">Portfolio Admin</h1>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="mt-8">
+            <div class="px-4 space-y-2">
+                <a href="{% url 'admin_custom:dashboard' %}" 
+                   class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if request.resolver_match.url_name == 'dashboard' %}bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300{% endif %}">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Dashboard
+                </a>
+                
+                <a href="{% url 'admin_custom:messages' %}" 
+                   class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if 'messages' in request.resolver_match.url_name %}bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300{% endif %}">
+                    <i class="fas fa-envelope mr-3"></i>
+                    Pesan
+                    {% if unread_messages_count %}
+                    <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">{{ unread_messages_count }}</span>
+                    {% endif %}
+                </a>
+                
+                <a href="{% url 'admin_custom:projects' %}" 
+                   class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if 'projects' in request.resolver_match.url_name %}bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300{% endif %}">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    Proyek
+                </a>
+                
+                <a href="{% url 'admin_custom:activity_logs' %}" 
+                   class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if 'activity' in request.resolver_match.url_name %}bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300{% endif %}">
+                    <i class="fas fa-history mr-3"></i>
+                    Log Aktivitas
+                </a>
+                
+                <a href="{% url 'admin_custom:settings' %}" 
+                   class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {% if 'settings' in request.resolver_match.url_name %}bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300{% endif %}">
+                    <i class="fas fa-cog mr-3"></i>
+                    Pengaturan
+                </a>
+                
+                <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+                
+                <a href="/" target="_blank" 
+                   class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-external-link-alt mr-3"></i>
+                    Lihat Website
+                </a>
+                
+                <a href="{% url 'admin:index' %}" 
+                   class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-tools mr-3"></i>
+                    Django Admin
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="lg:ml-64 content-transition">
+        <!-- Top Navigation -->
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between px-4 py-4">
+                <!-- Mobile menu button -->
+                <button @click="sidebarOpen = !sidebarOpen" 
+                        class="lg:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <!-- Page Title -->
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                    {% block page_title %}Dashboard{% endblock %}
+                </h2>
+                
+                <!-- Right side -->
+                <div class="flex items-center space-x-4">
+                    <!-- Dark mode toggle -->
+                    <button @click="toggleDarkMode()" 
+                            class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon" x-show="!darkMode"></i>
+                        <i class="fas fa-sun" x-show="darkMode" x-cloak></i>
+                    </button>
+                    
+                    <!-- Notifications -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative">
+                            <i class="fas fa-bell"></i>
+                            {% if unread_notifications_count %}
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </button>
+                        
+                        <!-- Notifications dropdown -->
+                        <div x-show="open" @click.away="open = false" x-cloak
+                             class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Notifikasi</h3>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                {% for notification in recent_notifications %}
+                                <div class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0">
+                                            <i class="{{ notification.icon|default:'fas fa-info-circle' }} text-{{ notification.notification_type }}-500"></i>
+                                        </div>
+                                        <div class="ml-3 flex-1">
+                                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ notification.title }}</p>
+                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ notification.message|truncatechars:50 }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ notification.created_at|timesince }} yang lalu</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                    Tidak ada notifikasi
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                                <a href="#" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">Lihat semua notifikasi</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- User menu -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100">
+                            <img class="w-8 h-8 rounded-full" src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username }}&background=6366f1&color=fff" alt="{{ user.get_full_name|default:user.username }}">
+                            <span class="hidden md:block">{{ user.get_full_name|default:user.username }}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        
+                        <!-- User dropdown -->
+                        <div x-show="open" @click.away="open = false" x-cloak
+                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                            <div class="py-2">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-user mr-2"></i>Profil
+                                </a>
+                                <a href="{% url 'admin_custom:settings' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-cog mr-2"></i>Pengaturan
+                                </a>
+                                <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                                <a href="{% url 'admin:logout' %}" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Page Content -->
+        <main class="p-6">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="mb-4 p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700{% elif message.tags == 'warning' %}bg-yellow-100 border border-yellow-400 text-yellow-700{% elif message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700{% else %}bg-blue-100 border border-blue-400 text-blue-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Mobile sidebar overlay -->
+    <div x-show="sidebarOpen" @click="sidebarOpen = false" 
+         class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" x-cloak></div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,299 @@
+{% extends 'custom_admin/layouts/base.html' %}
+
+{% block title %}About - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                            <i class="fas fa-home mr-2.5"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-400 dark:text-gray-500">About</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">About</h1>
+        </div>
+    </div>
+</div>
+
+<div class="flex flex-col">
+    <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow">
+                <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    {% if about %}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Left Column - Image -->
+                        <div class="md:col-span-1">
+                            <div class="flex flex-col items-center">
+                                {% if about.image %}
+                                <img src="{{ about.image.url }}" alt="{{ about.name }}" class="w-full h-auto max-w-xs rounded-lg shadow-md mb-4">
+                                {% else %}
+                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg shadow-md mb-4 dark:bg-gray-700">
+                                    <i class="fas fa-user text-4xl text-gray-400 dark:text-gray-500"></i>
+                                </div>
+                                {% endif %}
+                                <button type="button" data-modal-target="about-modal" data-modal-toggle="about-modal" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    <i class="fas fa-edit mr-2"></i>Edit About
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column - Details -->
+                        <div class="md:col-span-2">
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ about.name }}</h2>
+                            <p class="text-lg text-gray-500 dark:text-gray-400 mb-4">{{ about.title }}</p>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">About Me</h3>
+                                <div class="text-gray-700 dark:text-gray-300 space-y-4">
+                                    {{ about.description|linebreaks }}
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Contact Information</h3>
+                                    <ul class="space-y-2">
+                                        {% if about.email %}
+                                        <li class="flex items-center">
+                                            <i class="fas fa-envelope text-gray-500 dark:text-gray-400 mr-2"></i>
+                                            <span class="text-gray-700 dark:text-gray-300">{{ about.email }}</span>
+                                        </li>
+                                        {% endif %}
+                                        {% if about.phone %}
+                                        <li class="flex items-center">
+                                            <i class="fas fa-phone text-gray-500 dark:text-gray-400 mr-2"></i>
+                                            <span class="text-gray-700 dark:text-gray-300">{{ about.phone }}</span>
+                                        </li>
+                                        {% endif %}
+                                        {% if about.location %}
+                                        <li class="flex items-center">
+                                            <i class="fas fa-map-marker-alt text-gray-500 dark:text-gray-400 mr-2"></i>
+                                            <span class="text-gray-700 dark:text-gray-300">{{ about.location }}</span>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Social Media</h3>
+                                    <ul class="space-y-2">
+                                        {% if about.github %}
+                                        <li class="flex items-center">
+                                            <i class="fab fa-github text-gray-500 dark:text-gray-400 mr-2"></i>
+                                            <a href="{{ about.github }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline">GitHub</a>
+                                        </li>
+                                        {% endif %}
+                                        {% if about.linkedin %}
+                                        <li class="flex items-center">
+                                            <i class="fab fa-linkedin text-gray-500 dark:text-gray-400 mr-2"></i>
+                                            <a href="{{ about.linkedin }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline">LinkedIn</a>
+                                        </li>
+                                        {% endif %}
+                                        {% if about.twitter %}
+                                        <li class="flex items-center">
+                                            <i class="fab fa-twitter text-gray-500 dark:text-gray-400 mr-2"></i>
+                                            <a href="{{ about.twitter }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline">Twitter</a>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-10">
+                        <i class="fas fa-info-circle text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No About Information</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">You haven't added your about information yet.</p>
+                        <button type="button" data-modal-target="about-modal" data-modal-toggle="about-modal" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            <i class="fas fa-plus mr-2"></i>Add About Information
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Modal -->
+<div id="about-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    {% if about %}Edit{% else %}Add{% endif %} About Information
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="about-modal">
+                    <i class="fas fa-times"></i>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5 space-y-4">
+                <form id="about-form" method="post" enctype="multipart/form-data" action="{% if about %}{% url 'custom_admin:about_ajax_update' about.id %}{% else %}{% url 'custom_admin:about_ajax_create' %}{% endif %}">
+                    {% csrf_token %}
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your name" required value="{{ about.name|default:'' }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title/Position</label>
+                            <input type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="e.g. Full Stack Developer" required value="{{ about.title|default:'' }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                            <textarea id="description" name="description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Write about yourself...">{{ about.description|default:'' }}</textarea>
+                        </div>
+                        <div class="col-span-2">
+                            <label for="image" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Image</label>
+                            <input type="file" name="image" id="image" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400">
+                            {% if about.image %}
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Current: {{ about.image.url }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                            <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="your.email@example.com" value="{{ about.email|default:'' }}">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                            <input type="text" name="phone" id="phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="+1234567890" value="{{ about.phone|default:'' }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Location</label>
+                            <input type="text" name="location" id="location" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="City, Country" value="{{ about.location|default:'' }}">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="github" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">GitHub</label>
+                            <input type="url" name="github" id="github" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://github.com/username" value="{{ about.github|default:'' }}">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="linkedin" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">LinkedIn</label>
+                            <input type="url" name="linkedin" id="linkedin" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://linkedin.com/in/username" value="{{ about.linkedin|default:'' }}">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="twitter" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Twitter</label>
+                            <input type="url" name="twitter" id="twitter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://twitter.com/username" value="{{ about.twitter|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            <i class="fas fa-save mr-2"></i>Save
+                        </button>
+                        <button type="button" data-modal-hide="about-modal" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize modal functionality
+        const modalToggles = document.querySelectorAll('[data-modal-toggle]');
+        const modalHides = document.querySelectorAll('[data-modal-hide]');
+        const modalOverlay = document.getElementById('modal-overlay');
+        
+        modalToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                const modalId = toggle.getAttribute('data-modal-toggle');
+                const modal = document.getElementById(modalId);
+                modal.classList.toggle('hidden');
+            });
+        });
+        
+        modalHides.forEach(function(hide) {
+            hide.addEventListener('click', function() {
+                const modalId = hide.getAttribute('data-modal-hide');
+                const modal = document.getElementById(modalId);
+                modal.classList.add('hidden');
+            });
+        });
+        
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', function() {
+                document.getElementById('modal-container').classList.add('hidden');
+            });
+        }
+        
+        // Form submission with AJAX
+        const aboutForm = document.getElementById('about-form');
+        if (aboutForm) {
+            aboutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(aboutForm);
+                
+                fetch(aboutForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Hide modal
+                        document.getElementById('about-modal').classList.add('hidden');
+                        
+                        // Show success message
+                        showToast('success', data.message || 'About information saved successfully!');
+                        
+                        // Reload page after a short delay
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Show error message
+                        showToast('error', data.message || 'An error occurred while saving about information.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'An unexpected error occurred.');
+                });
+            });
+        }
+        
+        // Helper function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

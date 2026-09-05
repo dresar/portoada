@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Project model
+    window.templateFields = ['title', 'slug', 'category', 'short_description', 'description', 'start_date', 'end_date', 'github_url', 'live_url', 'image', 'status', 'is_featured', 'display_order'];
+</script>
+{% endblock %}

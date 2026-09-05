@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Civil Engineer Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Welcome Section -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome back, Admin!</h2>
+                <p class="text-gray-600">Here's what's happening with your portfolio today.</p>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover transition duration-300">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <i class="fas fa-project-diagram text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-500 text-sm">Total Projects</p>
+                            <h3 class="text-2xl font-bold text-gray-800">{{ project_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'custom_admin:project_list' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View all projects <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover transition duration-300">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-blog text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-500 text-sm">Blog Posts</p>
+                            <h3 class="text-2xl font-bold text-gray-800">{{ blog_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'custom_admin:blog_list' %}" class="text-green-600 hover:text-green-800 text-sm font-medium">
+                            View all posts <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover transition duration-300">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-500 text-sm">New Messages</p>
+                            <h3 class="text-2xl font-bold text-gray-800">{{ new_message_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'custom_admin:contact_message_list' %}" class="text-purple-600 hover:text-purple-800 text-sm font-medium">
+                            View all messages <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover transition duration-300">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-eye text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-500 text-sm">Total Views</p>
+                            <h3 class="text-2xl font-bold text-gray-800">{{ total_views }}</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="text-green-600 text-sm font-medium">
+                            <i class="fas fa-arrow-up mr-1"></i> 12% increase
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts and Recent Activity -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Chart -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Visitor Statistics</h3>
+                    <canvas id="visitorChart" height="300"></canvas>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Recent Activity</h3>
+                    
+                    <div class="space-y-4">
+                        {% for activity in recent_activities %}
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                    <i class="{{ activity.icon }}"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-800">{{ activity.description }}</p>
+                                <p class="text-xs text-gray-500">{{ activity.timestamp }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-800">New project "Modern Bridge Design" added</p>
+                                <p class="text-xs text-gray-500">Today at 10:30 AM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-800">Updated personal information</p>
+                                <p class="text-xs text-gray-500">Yesterday at 2:15 PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-800">New message from John Doe</p>
+                                <p class="text-xs text-gray-500">Yesterday at 9:30 AM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center text-white">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-800">Added new certificate "Advanced Structural Analysis"</p>
+                                <p class="text-xs text-gray-500">2 days ago</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View all activity <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Projects and Messages -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Projects -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Recent Projects</h3>
+                        <a href="{% url 'custom_admin:project_list' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View all <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for project in recent_projects %}
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <img class="h-10 w-10 rounded-md object-cover" src="{{ project.image.url }}" alt="{{ project.title }}">
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">{{ project.title }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-sm text-gray-600">{{ project.category.name }}</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full {{ project.status_color }}">{{ project.status }}</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <img class="h-10 w-10 rounded-md object-cover" src="https://via.placeholder.com/150" alt="Modern Bridge Design">
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">Modern Bridge Design</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-sm text-gray-600">Infrastructure</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Completed</span>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <img class="h-10 w-10 rounded-md object-cover" src="https://via.placeholder.com/150" alt="Residential Complex">
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">Residential Complex</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-sm text-gray-600">Residential</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">In Progress</span>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <img class="h-10 w-10 rounded-md object-cover" src="https://via.placeholder.com/150" alt="Commercial Building">
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">Commercial Building</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-sm text-gray-600">Commercial</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Planning</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Recent Messages -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Recent Messages</h3>
+                        <a href="{% url 'custom_admin:contact_message_list' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View all <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        {% for message in recent_messages %}
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                            <div class="flex justify-between">
+                                <h4 class="text-sm font-medium text-gray-800">{{ message.name }}</h4>
+                                <span class="text-xs text-gray-500">{{ message.created_at }}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">{{ message.email }}</p>
+                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ message.message|truncatechars:100 }}</p>
+                            <div class="mt-3">
+                                <a href="{% url 'custom_admin:contact_message_detail' message.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Read more <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                            <div class="flex justify-between">
+                                <h4 class="text-sm font-medium text-gray-800">John Doe</h4>
+                                <span class="text-xs text-gray-500">Today at 10:30 AM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">john.doe@example.com</p>
+                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">I'm interested in your residential complex project. Can we schedule a meeting to discuss potential collaboration?</p>
+                            <div class="mt-3">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Read more <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-200">
+                            <div class="flex justify-between">
+                                <h4 class="text-sm font-medium text-gray-800">Jane Smith</h4>
+                                <span class="text-xs text-gray-500">Yesterday at 2:15 PM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">jane.smith@example.com</p>
+                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">Your bridge design project is impressive! I'd like to know more about the materials and techniques you used.</p>
+                            <div class="mt-3">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Read more <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // Visitor chart
+        const ctx = document.getElementById('visitorChart').getContext('2d');
+        const visitorChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Portfolio Visitors',
+                    data: [650, 590, 800, 810, 960, 1050, 1250, 1300, 1420, 1550, 1620, 1700],
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            borderDash: [2, 4],
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

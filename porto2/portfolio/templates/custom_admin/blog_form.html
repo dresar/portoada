@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if form.instance.pk %}Edit Blog Post{% else %}Add New Blog Post{% endif %} - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Quill Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+        
+        /* Custom styles for Quill editor */
+        .ql-editor {
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* Custom file input */
+        .custom-file-input::-webkit-file-upload-button {
+            visibility: hidden;
+        }
+        
+        .custom-file-input::before {
+            content: 'Select file';
+            display: inline-block;
+            background: linear-gradient(to bottom, #f9f9f9, #e3e3e3);
+            border: 1px solid #999;
+            border-radius: 3px;
+            padding: 5px 8px;
+            outline: none;
+            white-space: nowrap;
+            cursor: pointer;
+            text-shadow: 1px 1px #fff;
+            font-weight: 700;
+            font-size: 10pt;
+        }
+        
+        .custom-file-input:hover::before {
+            border-color: black;
+        }
+        
+        .custom-file-input:active::before {
+            background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+        }
+        
+        /* Tag input styles */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 5px;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+        }
+        
+        .tag {
+            display: flex;
+            align-items: center;
+            margin: 2px;
+            padding: 0 8px;
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+        }
+        
+        .tag-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 5px;
+            min-width: 60px;
+        }
+        
+        .tag-close {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">{% if form.instance.pk %}Edit Blog Post{% else %}Add New Blog Post{% endif %}</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                            <i class="fas fa-home mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <a href="{% url 'custom_admin:blog_list' %}" class="text-gray-700 hover:text-blue-600">
+                                Blog Posts
+                            </a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-500">{% if form.instance.pk %}Edit Post{% else %}Add New Post{% endif %}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Blog Post Form -->
+            <form method="post" enctype="multipart/form-data" class="space-y-6" id="blog-form">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">There were errors with your submission</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    {% for field in form %}
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <li>{{ field.label }}: {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Main Content Column -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Basic Information Card -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Basic Information</h2>
+                            
+                            <div class="space-y-4">
+                                <!-- Title -->
+                                <div>
+                                    <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
+                                    <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="Enter blog post title">
+                                </div>
+                                
+                                <!-- Slug -->
+                                <div>
+                                    <label for="id_slug" class="block text-sm font-medium text-gray-700 mb-1">Slug <span class="text-red-500">*</span></label>
+                                    <div class="flex">
+                                        <input type="text" name="slug" id="id_slug" value="{{ form.slug.value|default:'' }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="enter-slug-here">
+                                        <button type="button" id="generate-slug" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                                            Generate
+                                        </button>
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500">URL-friendly version of the title (e.g., "modern-bridge-design")</p>
+                                </div>
+                                
+                                <!-- Excerpt -->
+                                <div>
+                                    <label for="id_excerpt" class="block text-sm font-medium text-gray-700 mb-1">Excerpt <span class="text-red-500">*</span></label>
+                                    <textarea name="excerpt" id="id_excerpt" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="Brief summary of the blog post">{{ form.excerpt.value|default:'' }}</textarea>
+                                    <p class="mt-1 text-xs text-gray-500">A short summary that appears in blog listings (150-200 characters recommended)</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content Card -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Content</h2>
+                            
+                            <div>
+                                <label for="editor" class="block text-sm font-medium text-gray-700 mb-1">Content <span class="text-red-500">*</span></label>
+                                <div id="editor">{{ form.content.value|safe|default:'' }}</div>
+                                <input type="hidden" name="content" id="id_content" value="{{ form.content.value|default:'' }}">
+                                <p class="mt-1 text-xs text-gray-500">Use the toolbar to format your content, add images, links, etc.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- SEO Card -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">SEO Settings</h2>
+                            
+                            <div class="space-y-4">
+                                <!-- Meta Title -->
+                                <div>
+                                    <label for="id_meta_title" class="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+                                    <input type="text" name="meta_title" id="id_meta_title" value="{{ form.meta_title.value|default:'' }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="SEO title (leave blank to use post title)">
+                                </div>
+                                
+                                <!-- Meta Description -->
+                                <div>
+                                    <label for="id_meta_description" class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+                                    <textarea name="meta_description" id="id_meta_description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300" placeholder="SEO description (leave blank to use excerpt)">{{ form.meta_description.value|default:'' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar Column -->
+                    <div class="space-y-6">
+                        <!-- Publish Settings Card -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Publish Settings</h2>
+                            
+                            <div class="space-y-4">
+                                <!-- Status -->
+                                <div>
+                                    <label for="id_status" class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+                                    <select name="status" id="id_status" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                        <option value="draft" {% if form.status.value == 'draft' %}selected{% endif %}>Draft</option>
+                                        <option value="published" {% if form.status.value == 'published' %}selected{% endif %}>Published</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Publication Date -->
+                                <div>
+                                    <label for="id_published_at" class="block text-sm font-medium text-gray-700 mb-1">Publication Date</label>
+                                    <input type="datetime-local" name="published_at" id="id_published_at" value="{{ form.published_at.value|date:'Y-m-d\TH:i'|default:'' }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                    <p class="mt-1 text-xs text-gray-500">Leave blank to use current time when published</p>
+                                </div>
+                                
+                                <!-- Featured Post -->
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="is_featured" id="id_is_featured" {% if form.is_featured.value %}checked{% endif %} class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition duration-300">
+                                    <label for="id_is_featured" class="ml-2 block text-sm text-gray-700">Featured Post</label>
+                                </div>
+                                
+                                <!-- Allow Comments -->
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="allow_comments" id="id_allow_comments" {% if form.allow_comments.value %}checked{% endif %} class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition duration-300">
+                                    <label for="id_allow_comments" class="ml-2 block text-sm text-gray-700">Allow Comments</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category Card -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Category</h2>
+                            
+                            <div>
+                                <label for="id_category" class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
+                                <select name="category" id="id_category" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if form.category.value == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                    {% empty %}
+                                    <option value="1">Civil Engineering</option>
+                                    <option value="2">Project Management</option>
+                                    <option value="3">Construction</option>
+                                    <option value="4">Architecture</option>
+                                    <option value="5">Sustainability</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="mt-2 flex justify-between items-center">
+                                    <a href="{% url 'custom_admin:blog_category_create' %}" class="text-blue-600 hover:text-blue-800 text-sm">
+                                        <i class="fas fa-plus mr-1"></i> Add New Category
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tags Card -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Tags</h2>
+                            
+                            <div>
+                                <label for="tag-input" class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                                <div class="tag-container">
+                                    <div id="tags-display"></div>
+                                    <input type="text" id="tag-input" class="tag-input" placeholder="Add tags...">
+                                </div>
+                                <input type="hidden" name="tags" id="id_tags" value="{{ form.tags.value|default:'' }}">
+                                <p class="mt-1 text-xs text-gray-500">Press Enter or comma to add a tag</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Featured Image Card -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Featured Image</h2>
+                            
+                            <div>
+                                <label for="id_image" class="block text-sm font-medium text-gray-700 mb-1">Image <span class="text-red-500">*</span></label>
+                                
+                                {% if form.instance.image %}
+                                <div class="mb-3">
+                                    <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current featured image" class="w-full h-40 object-cover rounded-md">
+                                </div>
+                                {% else %}
+                                <div class="mb-3">
+                                    <img id="image-preview" src="" alt="" class="w-full h-40 object-cover rounded-md hidden">
+                                </div>
+                                {% endif %}
+                                
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="id_image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition duration-300">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                            <p class="text-xs text-gray-500">PNG, JPG or WEBP (Max. 2MB)</p>
+                                        </div>
+                                        <input id="id_image" name="image" type="file" class="hidden" accept="image/*" {% if not form.instance.pk %}required{% endif %}>
+                                    </label>
+                                </div>
+                                
+                                {% if form.instance.image %}
+                                <div class="flex items-center mt-2">
+                                    <input type="checkbox" name="remove_image" id="id_remove_image" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded transition duration-300">
+                                    <label for="id_remove_image" class="ml-2 block text-sm text-red-700">Remove current image</label>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex flex-col space-y-3">
+                                <button type="submit" name="save" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                                    <i class="fas fa-save mr-2"></i> Save
+                                </button>
+                                
+                                <button type="submit" name="save_and_continue" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                                    <i class="fas fa-edit mr-2"></i> Save and Continue Editing
+                                </button>
+                                
+                                {% if form.instance.pk and form.instance.status == 'published' %}
+                                <a href="{% url 'main_app:blog_detail' form.instance.slug %}" target="_blank" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                                    <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                </a>
+                                {% endif %}
+                                
+                                <a href="{% url 'custom_admin:blog_list' %}" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                                    <i class="fas fa-times mr-2"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+    
+    <!-- Quill Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // Initialize Quill editor
+        const quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    ['blockquote', 'code-block'],
+                    ['link', 'image', 'video'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Write your blog post content here...'
+        });
+        
+        // Update hidden form field with Quill content before submit
+        document.getElementById('blog-form').addEventListener('submit', function() {
+            document.getElementById('id_content').value = quill.root.innerHTML;
+        });
+        
+        // Generate slug from title
+        document.getElementById('generate-slug').addEventListener('click', function() {
+            const title = document.getElementById('id_title').value;
+            if (title) {
+                // Convert to lowercase, replace spaces with hyphens, remove special chars
+                const slug = title.toLowerCase()
+                    .replace(/[^\w\s-]/g, '') // Remove special characters
+                    .replace(/\s+/g, '-')     // Replace spaces with hyphens
+                    .replace(/-+/g, '-');     // Replace multiple hyphens with single hyphen
+                
+                document.getElementById('id_slug').value = slug;
+            }
+        });
+        
+        // Auto-generate slug when typing title (optional)
+        document.getElementById('id_title').addEventListener('blur', function() {
+            const slugField = document.getElementById('id_slug');
+            if (this.value && !slugField.value) {
+                document.getElementById('generate-slug').click();
+            }
+        });
+        
+        // Image preview
+        document.getElementById('id_image').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('image-preview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Tags input
+        const tagInput = document.getElementById('tag-input');
+        const tagsDisplay = document.getElementById('tags-display');
+        const tagsField = document.getElementById('id_tags');
+        let tags = [];
+        
+        // Initialize tags from hidden field
+        if (tagsField.value) {
+            tags = tagsField.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+            renderTags();
+        }
+        
+        function addTag(tag) {
+            tag = tag.trim();
+            if (tag && !tags.includes(tag)) {
+                tags.push(tag);
+                renderTags();
+                updateTagsField();
+            }
+        }
+        
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+            updateTagsField();
+        }
+        
+        function renderTags() {
+            tagsDisplay.innerHTML = '';
+            tags.forEach((tag, index) => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag';
+                tagElement.innerHTML = `
+                    <span>${tag}</span>
+                    <span class="tag-close" data-index="${index}">×</span>
+                `;
+                tagsDisplay.appendChild(tagElement);
+            });
+            
+            // Add event listeners to close buttons
+            document.querySelectorAll('.tag-close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function() {
+                    removeTag(this.dataset.index);
+                });
+            });
+        }
+        
+        function updateTagsField() {
+            tagsField.value = tags.join(',');
+        }
+        
+        tagInput.addEventListener('keydown', function(e) {
+            if ((e.key === 'Enter' || e.key === ',') && this.value) {
+                e.preventDefault();
+                addTag(this.value);
+                this.value = '';
+            }
+        });
+        
+        tagInput.addEventListener('blur', function() {
+            if (this.value) {
+                addTag(this.value);
+                this.value = '';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">Projects</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Page Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Projects</h2>
+                
+                <a href="{% url 'custom_admin:project_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Add New Project
+                </a>
+            </div>
+            
+            <!-- Filters and Search -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <div class="relative">
+                            <select id="category-filter" class="appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                                <option value="1">Infrastructure</option>
+                                <option value="2">Residential</option>
+                                <option value="3">Commercial</option>
+                                <option value="4">Industrial</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="relative">
+                            <select id="status-filter" class="appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">All Status</option>
+                                <option value="completed">Completed</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="planning">Planning</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <input type="text" id="search" placeholder="Search projects..." class="w-full sm:w-64 bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pl-10 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Projects Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                {% for project in projects %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative">
+                        <img src="{{ project.image.url }}" alt="{{ project.title }}" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ project.status_color }}">{{ project.status }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-800 mb-1">{{ project.title }}</h3>
+                            <span class="text-xs text-gray-500">{{ project.date }}</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-3">{{ project.category.name }}</p>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ project.description|truncatechars:100 }}</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'custom_admin:project_edit' project.id %}" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'custom_admin:project_delete' project.id %}" class="text-red-600 hover:text-red-800 transition duration-200" onclick="return confirm('Are you sure you want to delete this project?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <a href="{% url 'custom_admin:project_detail' project.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <!-- Example Project 1 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1545630478-cf67a8de5843?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Modern Bridge Design" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Completed</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-800 mb-1">Modern Bridge Design</h3>
+                            <span class="text-xs text-gray-500">Jan 2023</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-3">Infrastructure</p>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">A modern suspension bridge design with innovative materials and earthquake-resistant features. The project showcases advanced engineering techniques.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-red-600 hover:text-red-800 transition duration-200" onclick="return confirm('Are you sure you want to delete this project?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example Project 2 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Residential Complex" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">In Progress</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-800 mb-1">Residential Complex</h3>
+                            <span class="text-xs text-gray-500">Mar 2023</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-3">Residential</p>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">A sustainable residential complex with 50 units, featuring energy-efficient design, green spaces, and community facilities.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-red-600 hover:text-red-800 transition duration-200" onclick="return confirm('Are you sure you want to delete this project?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example Project 3 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Commercial Building" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Planning</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-800 mb-1">Commercial Building</h3>
+                            <span class="text-xs text-gray-500">Jun 2023</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-3">Commercial</p>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">A modern office building with smart technology integration, flexible workspaces, and sustainable design principles.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-red-600 hover:text-red-800 transition duration-200" onclick="return confirm('Are you sure you want to delete this project?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example Project 4 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1513828583688-c52646db42da?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Highway Expansion" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Completed</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-800 mb-1">Highway Expansion</h3>
+                            <span class="text-xs text-gray-500">Nov 2022</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-3">Infrastructure</p>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">A major highway expansion project including new lanes, bridges, and smart traffic management systems to reduce congestion.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-red-600 hover:text-red-800 transition duration-200" onclick="return confirm('Are you sure you want to delete this project?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example Project 5 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1590274853856-f22d5ee3d228?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Industrial Facility" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">In Progress</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-800 mb-1">Industrial Facility</h3>
+                            <span class="text-xs text-gray-500">Apr 2023</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-3">Industrial</p>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">A state-of-the-art manufacturing facility with automated systems, energy-efficient design, and optimized workflow layout.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-red-600 hover:text-red-800 transition duration-200" onclick="return confirm('Are you sure you want to delete this project?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example Project 6 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Water Treatment Plant" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Planning</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-800 mb-1">Water Treatment Plant</h3>
+                            <span class="text-xs text-gray-500">Aug 2023</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-3">Infrastructure</p>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">A modern water treatment facility designed to serve a growing urban area with advanced filtration and purification systems.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-red-600 hover:text-red-800 transition duration-200" onclick="return confirm('Are you sure you want to delete this project?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            <div class="flex justify-center">
+                <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    
+                    <a href="#" aria-current="page" class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100">
+                        1
+                    </a>
+                    
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        2
+                    </a>
+                    
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        3
+                    </a>
+                    
+                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                        ...
+                    </span>
+                    
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        8
+                    </a>
+                    
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        9
+                    </a>
+                    
+                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </nav>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // Filter and search functionality
+        const categoryFilter = document.getElementById('category-filter');
+        const statusFilter = document.getElementById('status-filter');
+        const searchInput = document.getElementById('search');
+        
+        function applyFilters() {
+            // This would be implemented with AJAX in a real application
+            console.log('Category:', categoryFilter.value);
+            console.log('Status:', statusFilter.value);
+            console.log('Search:', searchInput.value);
+        }
+        
+        categoryFilter.addEventListener('change', applyFilters);
+        statusFilter.addEventListener('change', applyFilters);
+        searchInput.addEventListener('input', applyFilters);
+    </script>
+</body>
+</html>

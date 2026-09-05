@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Experience model
+    window.templateFields = ['user', 'company', 'position', 'location', 'start_date', 'end_date', 'description', 'is_current'];
+</script>
+{% endblock %}

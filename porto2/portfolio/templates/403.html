@@ -1,0 +1,114 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Access Forbidden - Civil Engineer Portfolio{% endblock %}
+
+{% block extra_css %}
+.error-container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 700;
+    color: #f59e0b;
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-illustration {
+    max-width: 100%;
+    height: auto;
+    margin: 2rem 0;
+}
+
+.error-message {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.error-description {
+    color: #6b7280;
+    max-width: 500px;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.back-home-btn {
+    transition: all 0.3s ease;
+}
+
+.back-home-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+{% endblock %}
+
+{% block content %}
+<div class="error-container container mx-auto px-4 py-16">
+    <div class="error-code">403</div>
+    
+    <div class="error-illustration">
+        <svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 600 400">
+            <!-- Fence/Barrier Structure -->
+            <g fill="#e5e7eb" stroke="#d1d5db" stroke-width="2">
+                <!-- Fence Base -->
+                <rect x="150" y="300" width="300" height="10" rx="2" />
+                
+                <!-- Fence Posts -->
+                <rect x="170" y="200" width="10" height="100" rx="2" />
+                <rect x="230" y="200" width="10" height="100" rx="2" />
+                <rect x="290" y="200" width="10" height="100" rx="2" />
+                <rect x="350" y="200" width="10" height="100" rx="2" />
+                <rect x="410" y="200" width="10" height="100" rx="2" />
+                
+                <!-- Fence Horizontal Bars -->
+                <rect x="150" y="220" width="300" height="8" rx="2" />
+                <rect x="150" y="260" width="300" height="8" rx="2" />
+            </g>
+            
+            <!-- Warning Sign -->
+            <g transform="translate(290, 150)">
+                <path d="M0 0 L40 0 L20 40 Z" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+                <text x="20" y="25" text-anchor="middle" font-size="25" font-weight="bold" fill="#7c2d12">!</text>
+            </g>
+            
+            <!-- Lock -->
+            <g transform="translate(240, 240)">
+                <rect x="0" y="0" width="30" height="25" rx="3" fill="#6b7280" stroke="#4b5563" stroke-width="2" />
+                <path d="M5 0 Q5 -15 15 -15 Q25 -15 25 0" fill="none" stroke="#4b5563" stroke-width="3" stroke-linecap="round" />
+                <circle cx="15" cy="12" r="5" fill="#e5e7eb" />
+            </g>
+            
+            <!-- Hard Hat -->
+            <g transform="translate(350, 240) scale(0.8)">
+                <ellipse cx="30" cy="30" rx="30" ry="10" fill="#f59e0b" />
+                <path d="M10 30 Q30 0 50 30" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+            </g>
+            
+            <!-- Person (Silhouette) -->
+            <g transform="translate(200, 350) scale(0.8)">
+                <circle cx="0" cy="-80" r="15" fill="#6b7280" />
+                <line x1="0" y1="-65" x2="0" y2="-20" stroke="#6b7280" stroke-width="5" />
+                <line x1="0" y1="-55" x2="-20" y2="-35" stroke="#6b7280" stroke-width="5" />
+                <line x1="0" y1="-55" x2="20" y2="-35" stroke="#6b7280" stroke-width="5" />
+                <line x1="0" y1="-20" x2="-15" y2="0" stroke="#6b7280" stroke-width="5" />
+                <line x1="0" y1="-20" x2="15" y2="0" stroke="#6b7280" stroke-width="5" />
+            </g>
+        </svg>
+    </div>
+    
+    <h1 class="error-message">Access Forbidden</h1>
+    
+    <p class="error-description">This area is under construction and requires proper authorization. You don't have the necessary permissions to access this section.</p>
+    
+    <a href="{% url 'main_app:home' %}" class="back-home-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300 inline-flex items-center">
+        <i class="fas fa-home mr-2"></i> Back to Home
+    </a>
+</div>
+{% endblock %}

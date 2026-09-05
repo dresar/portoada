@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Tags - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">Blog Tags</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                            <i class="fas fa-home mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <a href="{% url 'custom_admin:blog_list' %}" class="text-gray-700 hover:text-blue-600">
+                                Blog Posts
+                            </a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-500">Tags</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Header with Actions -->
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+                <h2 class="text-2xl font-bold text-gray-800">Blog Tags</h2>
+                
+                <div class="flex items-center space-x-3">
+                    <button id="add-tag-button" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Tag
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tags List -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <div class="relative">
+                            <input type="text" id="search-tags" placeholder="Search tags..." class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-3 mt-4">
+                        {% for tag in tags %}
+                        <div class="tag-item flex items-center bg-gray-100 rounded-full px-4 py-2 text-sm font-medium text-gray-700">
+                            <span>{{ tag.name }}</span>
+                            <span class="ml-2 text-xs text-gray-500">({{ tag.post_count }})</span>
+                            <div class="ml-2 flex space-x-1">
+                                <button class="text-blue-600 hover:text-blue-800 edit-tag" data-id="{{ tag.id }}" data-name="{{ tag.name }}" data-slug="{{ tag.slug }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-600 hover:text-red-800 delete-tag" data-id="{{ tag.id }}" data-name="{{ tag.name }}" {% if tag.post_count > 0 %}disabled{% endif %}>
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="w-full text-center py-8">
+                            <p class="text-gray-500">No tags found. Click "Add Tag" to create your first tag.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            {% if tags.has_other_pages %}
+            <div class="flex justify-center mt-6">
+                <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    {% if tags.has_previous %}
+                    <a href="?page={{ tags.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    {% else %}
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                    {% endif %}
+                    
+                    {% for i in tags.paginator.page_range %}
+                        {% if tags.number == i %}
+                        <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                            {{ i }}
+                        </span>
+                        {% else %}
+                        <a href="?page={{ i }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            {{ i }}
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if tags.has_next %}
+                    <a href="?page={{ tags.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% else %}
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+    
+    <!-- Add/Edit Tag Modal -->
+    <div id="tag-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-4">Add Tag</h3>
+                
+                <form id="tag-form" method="post" action="{% url 'custom_admin:blog_tag_add' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="tag-id" name="tag_id" value="">
+                    
+                    <div class="mb-4">
+                        <label for="tag-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" id="tag-name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="tag-slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                        <input type="text" id="tag-slug" name="slug" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        <p class="mt-1 text-xs text-gray-500">The "slug" is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancel-tag" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                            Cancel
+                        </button>
+                        
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+                <p id="delete-message" class="text-gray-700 mb-6">Are you sure you want to delete the tag "<span id="delete-tag-name"></span>"? This action cannot be undone.</p>
+                
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-delete" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                        Cancel
+                    </button>
+                    
+                    <form id="delete-form" method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // Search tags
+        const searchInput = document.getElementById('search-tags');
+        const tagItems = document.querySelectorAll('.tag-item');
+        
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            tagItems.forEach(item => {
+                const tagName = item.querySelector('span').textContent.toLowerCase();
+                
+                if (tagName.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // Tag Modal
+        const addTagButton = document.getElementById('add-tag-button');
+        const tagModal = document.getElementById('tag-modal');
+        const cancelTag = document.getElementById('cancel-tag');
+        const tagForm = document.getElementById('tag-form');
+        const modalTitle = document.getElementById('modal-title');
+        const tagId = document.getElementById('tag-id');
+        const tagName = document.getElementById('tag-name');
+        const tagSlug = document.getElementById('tag-slug');
+        
+        // Add Tag
+        addTagButton.addEventListener('click', () => {
+            modalTitle.textContent = 'Add Tag';
+            tagForm.action = "{% url 'custom_admin:blog_tag_add' %}";
+            tagId.value = '';
+            tagName.value = '';
+            tagSlug.value = '';
+            tagModal.classList.remove('hidden');
+        });
+        
+        // Edit Tag
+        const editButtons = document.querySelectorAll('.edit-tag');
+        
+        editButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                const id = button.dataset.id;
+                const name = button.dataset.name;
+                const slug = button.dataset.slug;
+                
+                modalTitle.textContent = 'Edit Tag';
+                tagForm.action = `{% url 'custom_admin:blog_tag_edit' 0 %}`.replace('0', id);
+                tagId.value = id;
+                tagName.value = name;
+                tagSlug.value = slug;
+                tagModal.classList.remove('hidden');
+            });
+        });
+        
+        // Auto-generate slug from name
+        tagName.addEventListener('input', () => {
+            if (!tagId.value) { // Only auto-generate for new tags
+                tagSlug.value = tagName.value
+                    .toLowerCase()
+                    .replace(/[^\w\s-]/g, '') // Remove special characters
+                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                    .replace(/-+/g, '-'); // Replace multiple hyphens with a single hyphen
+            }
+        });
+        
+        // Cancel Tag Modal
+        cancelTag.addEventListener('click', () => {
+            tagModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        tagModal.addEventListener('click', (event) => {
+            if (event.target === tagModal) {
+                tagModal.classList.add('hidden');
+            }
+        });
+        
+        // Delete Tag
+        const deleteButtons = document.querySelectorAll('.delete-tag');
+        const deleteModal = document.getElementById('delete-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const deleteForm = document.getElementById('delete-form');
+        const deleteTagName = document.getElementById('delete-tag-name');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                if (button.hasAttribute('disabled')) {
+                    return;
+                }
+                
+                const id = button.dataset.id;
+                const name = button.dataset.name;
+                
+                deleteTagName.textContent = name;
+                deleteForm.action = `{% url 'custom_admin:blog_tag_delete' 0 %}`.replace('0', id);
+                deleteModal.classList.remove('hidden');
+            });
+        });
+        
+        // Cancel Delete
+        cancelDelete.addEventListener('click', () => {
+            deleteModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        deleteModal.addEventListener('click', (event) => {
+            if (event.target === deleteModal) {
+                deleteModal.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

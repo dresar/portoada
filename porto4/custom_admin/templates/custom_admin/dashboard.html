@@ -1,0 +1,220 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Dashboard - Custom Admin{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h3 text-white mb-0">
+            <i class="bi bi-speedometer2 me-2"></i>
+            Dashboard
+        </h1>
+        <p class="text-muted">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-1 mb-3"></i>
+                <h3 class="mb-1">{{ stats.users }}</h3>
+                <p class="mb-0">Users</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-folder fs-1 mb-3"></i>
+                <h3 class="mb-1">{{ stats.projects }}</h3>
+                <p class="mb-0">Projects</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-journal-text fs-1 mb-3"></i>
+                <h3 class="mb-1">{{ stats.blog_posts }}</h3>
+                <p class="mb-0">Blog Posts</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-envelope fs-1 mb-3"></i>
+                <h3 class="mb-1">{{ stats.messages }}</h3>
+                <p class="mb-0">Messages</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-star fs-1 mb-3"></i>
+                <h3 class="mb-1">{{ stats.skills }}</h3>
+                <p class="mb-0">Skills</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-award fs-1 mb-3"></i>
+                <h3 class="mb-1">{{ stats.certificates }}</h3>
+                <p class="mb-0">Certificates</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Messages -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-envelope me-2"></i>
+                    Recent Messages
+                </h5>
+                <a href="{% url 'custom_admin:contact_messages' %}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_messages %}
+                    <div class="list-group list-group-flush">
+                        {% for message in recent_messages %}
+                            <div class="list-group-item bg-transparent border-secondary">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-white">{{ message.name }}</h6>
+                                    <small class="text-muted">{{ message.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1 text-muted">{{ message.subject }}</p>
+                                <small class="text-muted">{{ message.email }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-envelope text-muted fs-1 mb-3"></i>
+                        <p class="text-muted">No recent messages</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Blog Posts -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-journal-text me-2"></i>
+                    Recent Blog Posts
+                </h5>
+                <a href="{% url 'custom_admin:blog_posts' %}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_posts %}
+                    <div class="list-group list-group-flush">
+                        {% for post in recent_posts %}
+                            <div class="list-group-item bg-transparent border-secondary">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-white">{{ post.title|truncatechars:40 }}</h6>
+                                    <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1 text-muted">{{ post.excerpt|truncatechars:80 }}</p>
+                                <small class="text-muted">
+                                    <span class="badge bg-secondary">{{ post.status }}</span>
+                                    {% if post.is_featured %}
+                                        <span class="badge bg-warning">Featured</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-journal-text text-muted fs-1 mb-3"></i>
+                        <p class="text-muted">No recent blog posts</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'custom_admin:projects' %}" class="btn btn-outline-primary w-100 py-3">
+                            <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
+                            Add Project
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'custom_admin:blog_posts' %}" class="btn btn-outline-success w-100 py-3">
+                            <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
+                            Add Blog Post
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'custom_admin:skills' %}" class="btn btn-outline-warning w-100 py-3">
+                            <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
+                            Add Skill
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'custom_admin:services' %}" class="btn btn-outline-info w-100 py-3">
+                            <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
+                            Add Service
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh dashboard every 5 minutes
+    setTimeout(function() {
+        location.reload();
+    }, 300000);
+    
+    // Add some interactive effects
+    document.querySelectorAll('.stats-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,566 @@
+{% extends 'custom_admin/layouts/base.html' %}
+
+{% block title %}Profile - Admin Panel{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Flowbite modals
+        const $targetEl = document.getElementById('profile-modal');
+        
+        if ($targetEl) {
+            // Options with default values
+            const options = {
+                placement: 'center',
+                backdrop: 'dynamic',
+                backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
+                closable: true,
+                onHide: () => {
+                    console.log('modal is hidden');
+                },
+                onShow: () => {
+                    console.log('modal is shown');
+                },
+                onToggle: () => {
+                    console.log('modal has been toggled');
+                }
+            };
+            
+            // Create modal instance using the correct Flowbite syntax
+            const modal = new Modal($targetEl, options);
+            
+            // Store modal instance globally for access in other functions
+            window.profileModal = modal;
+            
+            // Get all buttons that should open the modal
+            const modalToggles = document.querySelectorAll('[data-modal-toggle="profile-modal"]');
+            modalToggles.forEach(button => {
+                button.addEventListener('click', () => {
+                    modal.toggle();
+                });
+            });
+            
+            // Get all buttons that should open the modal
+            const modalTargets = document.querySelectorAll('[data-modal-target="profile-modal"]');
+            modalTargets.forEach(button => {
+                button.addEventListener('click', () => {
+                    modal.show();
+                });
+            });
+            
+            // Handle form submission
+            const profileForm = document.getElementById('profile-form');
+            if (profileForm) {
+                profileForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    
+                    fetch(this.getAttribute('action'), {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Show success message
+                            showToast('success', data.message);
+                            
+                            // Close modal and reload page
+                            window.profileModal.hide();
+                            
+                            // Reload the page after a short delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            // Show error message
+                            showToast('error', data.message || 'An error occurred');
+                            
+                            // Display validation errors if any
+                            if (data.errors) {
+                                Object.keys(data.errors).forEach(field => {
+                                    const input = document.querySelector(`[name=${field}]`);
+                                    if (input) {
+                                        input.classList.add('border-red-500');
+                                        const errorMsg = document.createElement('p');
+                                        errorMsg.classList.add('text-red-500', 'text-xs', 'mt-1');
+                                        errorMsg.textContent = data.errors[field][0];
+                                        input.parentNode.appendChild(errorMsg);
+                                    }
+                                });
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('error', 'An unexpected error occurred');
+                    });
+                });
+            }
+        }
+    });
+    
+    // Helper function to show toast notifications
+    function showToast(type, message) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800`;
+        
+        let icon = '';
+        let color = '';
+        
+        switch(type) {
+            case 'success':
+                icon = '<i class="fas fa-check-circle text-green-500 mr-3 text-xl"></i>';
+                color = 'text-green-500';
+                break;
+            case 'error':
+                icon = '<i class="fas fa-exclamation-circle text-red-500 mr-3 text-xl"></i>';
+                color = 'text-red-500';
+                break;
+            case 'warning':
+                icon = '<i class="fas fa-exclamation-triangle text-yellow-500 mr-3 text-xl"></i>';
+                color = 'text-yellow-500';
+                break;
+            default:
+                icon = '<i class="fas fa-info-circle text-blue-500 mr-3 text-xl"></i>';
+                color = 'text-blue-500';
+        }
+        
+        toast.innerHTML = `
+            <div class="inline-flex items-center justify-center flex-shrink-0">
+                ${icon}
+            </div>
+            <div class="ml-3 text-sm font-normal ${color}">${message}</div>
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+</script>
+{% endblock %}
+
+<!-- Profile Modal -->
+<div id="profile-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 items-center justify-center hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-4xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    {% if profile %}Edit{% else %}Add{% endif %} Profile Information
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="profile-modal">
+                    <i class="fas fa-times"></i>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
+                <form id="profile-form" method="post" enctype="multipart/form-data" action="{% if profile %}{% url 'custom_admin:profile_ajax_update' profile.id %}{% else %}{% url 'custom_admin:profile_ajax_create' %}{% endif %}" data-action="{% if profile %}{% url 'custom_admin:profile_ajax_update' profile.id %}{% else %}{% url 'custom_admin:profile_ajax_create' %}{% endif %}">
+                    {% csrf_token %}
+                    
+                    <div class="grid gap-6 mb-6 md:grid-cols-2">
+                        <!-- Site Title -->
+                        <div>
+                            <label for="site_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Site Title <span class="text-red-500">*</span></label>
+                            <input type="text" id="site_title" name="site_title" value="{{ profile.site_title|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your website title" required>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="site_title-error"></p>
+                        </div>
+                        
+                        <!-- Tagline -->
+                        <div>
+                            <label for="tagline" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tagline <span class="text-red-500">*</span></label>
+                            <input type="text" id="tagline" name="tagline" value="{{ profile.tagline|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your website tagline" required>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="tagline-error"></p>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" name="email" value="{{ profile.email|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="contact@example.com" required>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="email-error"></p>
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div>
+                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                            <input type="text" id="phone" name="phone" value="{{ profile.phone|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="+1 (123) 456-7890">
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="phone-error"></p>
+                        </div>
+                        
+                        <!-- Address -->
+                        <div class="col-span-2">
+                            <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                            <input type="text" id="address" name="address" value="{{ profile.address|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="123 Main St, City, Country">
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="address-error"></p>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="col-span-2">
+                            <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description <span class="text-red-500">*</span></label>
+                            <textarea id="description" name="description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Website description" required>{{ profile.description|default:'' }}</textarea>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="description-error"></p>
+                        </div>
+                        
+                        <!-- Keywords -->
+                        <div class="col-span-2">
+                            <label for="keywords" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Keywords</label>
+                            <input type="text" id="keywords" name="keywords" value="{{ profile.keywords|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="keyword1, keyword2, keyword3">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Separate keywords with commas</p>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="keywords-error"></p>
+                        </div>
+                        
+                        <!-- Social Media Links -->
+                        <div>
+                            <label for="github" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">GitHub</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-github"></i>
+                                </span>
+                                <input type="url" id="github" name="github" value="{{ profile.github|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://github.com/username">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="github-error"></p>
+                        </div>
+                        
+                        <div>
+                            <label for="linkedin" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">LinkedIn</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-linkedin"></i>
+                                </span>
+                                <input type="url" id="linkedin" name="linkedin" value="{{ profile.linkedin|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://linkedin.com/in/username">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="linkedin-error"></p>
+                        </div>
+                        
+                        <!-- Logo -->
+                        <div>
+                            <label for="logo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Logo</label>
+                            <input type="file" id="logo" name="logo" accept="image/*" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">PNG, JPG or JPEG (MAX. 2MB)</p>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="logo-error"></p>
+                            
+                            {% if profile.logo %}
+                            <div class="mt-2 flex items-center space-x-2">
+                                <img src="{{ profile.logo.url }}" alt="Logo" class="h-16 w-16 object-contain border dark:border-gray-700">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    <p>Current logo</p>
+                                    <div class="flex items-center mt-1">
+                                        <input id="keep_logo" type="checkbox" name="keep_logo" value="yes" checked class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="keep_logo" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Keep this logo</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Favicon -->
+                        <div>
+                            <label for="favicon" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Favicon</label>
+                            <input type="file" id="favicon" name="favicon" accept="image/*" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">PNG or ICO (16x16 or 32x32 pixels)</p>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="favicon-error"></p>
+                            
+                            {% if profile.favicon %}
+                            <div class="mt-2 flex items-center space-x-2">
+                                <img src="{{ profile.favicon.url }}" alt="Favicon" class="h-8 w-8 object-contain border dark:border-gray-700">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    <p>Current favicon</p>
+                                    <div class="flex items-center mt-1">
+                                        <input id="keep_favicon" type="checkbox" name="keep_favicon" value="yes" checked class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="keep_favicon" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Keep this favicon</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Status -->
+                        <div class="col-span-2">
+                            <div class="flex items-center">
+                                <input id="is_active" type="checkbox" name="is_active" value="yes" {% if profile.is_active or profile.is_active is None %}checked{% endif %} class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="is_active" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Active</label>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Active profile will be used for the website</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Error Message -->
+                    <div id="form-error" class="hidden p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                        <span class="font-medium">Error!</span> <span id="form-error-message"></span>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <button type="button" data-modal-hide="profile-modal" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </button>
+                <button type="button" id="submit-profile-form" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <i class="fas fa-save mr-2"></i>Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Submit form button
+        const submitButton = document.getElementById('submit-profile-form');
+        submitButton.addEventListener('click', function() {
+            const form = document.getElementById('profile-form');
+            submitForm(form);
+        });
+        
+        // File input change events
+        const logoInput = document.getElementById('logo');
+        if (logoInput) {
+            logoInput.addEventListener('change', function() {
+                const keepLogoCheckbox = document.getElementById('keep_logo');
+                if (keepLogoCheckbox && this.files.length > 0) {
+                    keepLogoCheckbox.checked = false;
+                }
+            });
+        }
+        
+        const faviconInput = document.getElementById('favicon');
+        if (faviconInput) {
+            faviconInput.addEventListener('change', function() {
+                const keepFaviconCheckbox = document.getElementById('keep_favicon');
+                if (keepFaviconCheckbox && this.files.length > 0) {
+                    keepFaviconCheckbox.checked = false;
+                }
+            });
+        }
+    });
+    
+    // Submit form via AJAX
+    function submitForm(form) {
+        // Clear previous error messages
+        clearErrors();
+        
+        // Get form data
+        const formData = new FormData(form);
+        const actionUrl = form.getAttribute('data-action');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Check if keep_logo checkbox exists and is unchecked
+        const keepLogoCheckbox = document.getElementById('keep_logo');
+        if (keepLogoCheckbox && !keepLogoCheckbox.checked) {
+            formData.append('remove_logo', 'yes');
+        }
+        
+        // Check if keep_favicon checkbox exists and is unchecked
+        const keepFaviconCheckbox = document.getElementById('keep_favicon');
+        if (keepFaviconCheckbox && !keepFaviconCheckbox.checked) {
+            formData.append('remove_favicon', 'yes');
+        }
+        
+        // Submit form
+        fetch(actionUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Hide modal
+                const modal = document.getElementById('profile-modal');
+                if (modal) {
+                    window.location.reload();
+                }
+            } else {
+                // Show errors
+                if (data.errors) {
+                    showErrors(data.errors);
+                } else {
+                    showFormError(data.message || 'An error occurred while saving the profile.');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showFormError('An error occurred while saving the profile.');
+        });
+    }
+    
+    // Show field errors
+    function showErrors(errors) {
+        for (const field in errors) {
+            const errorElement = document.getElementById(`${field}-error`);
+            if (errorElement) {
+                errorElement.textContent = errors[field];
+                errorElement.classList.remove('hidden');
+            }
+        }
+    }
+    
+    // Show form error
+    function showFormError(message) {
+        const formError = document.getElementById('form-error');
+        const formErrorMessage = document.getElementById('form-error-message');
+        if (formError && formErrorMessage) {
+            formErrorMessage.textContent = message;
+            formError.classList.remove('hidden');
+        }
+    }
+    
+    // Clear all error messages
+    function clearErrors() {
+        // Clear field errors
+        const errorElements = document.querySelectorAll('.error-message');
+        errorElements.forEach(element => {
+            element.textContent = '';
+            element.classList.add('hidden');
+        });
+        
+        // Clear form error
+        const formError = document.getElementById('form-error');
+        if (formError) {
+            formError.classList.add('hidden');
+        }
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                            <i class="fas fa-home mr-2.5"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-400 dark:text-gray-500">Profile</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Profile</h1>
+        </div>
+    </div>
+</div>
+
+<div class="flex flex-col">
+    <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow">
+                <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    {% if profile %}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Left Column - Image -->
+                        <div class="md:col-span-1">
+                            <div class="flex flex-col items-center">
+                                {% if profile.logo %}
+                                <img src="{{ profile.logo.url }}" alt="{{ profile.site_title }}" class="w-full h-auto max-w-xs rounded-lg shadow-md mb-4">
+                                {% else %}
+                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg shadow-md mb-4 dark:bg-gray-700">
+                                    <i class="fas fa-globe text-4xl text-gray-400 dark:text-gray-500"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex space-x-2">
+                                    <a href="{% url 'custom_admin:profile_detail' %}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                        <i class="fas fa-eye mr-2"></i>View Profile
+                                    </a>
+                                    <button type="button" data-modal-target="profile-modal" data-modal-toggle="profile-modal" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                        <i class="fas fa-edit mr-2"></i>Edit Profile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column - Details -->
+                        <div class="md:col-span-2">
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ profile.site_title }}</h2>
+                                <p class="text-lg text-gray-700 dark:text-gray-300">{{ profile.tagline }}</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">
+                                        <a href="mailto:{{ profile.email }}" class="text-primary-600 dark:text-primary-500 hover:underline">{{ profile.email }}</a>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">{{ profile.phone }}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Address</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">{{ profile.address }}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">
+                                        {% if profile.is_active %}
+                                        <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                                            <i class="fas fa-check-circle mr-1"></i> Active
+                                        </span>
+                                        {% else %}
+                                        <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
+                                            <i class="fas fa-times-circle mr-1"></i> Inactive
+                                        </span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Description</h3>
+                                <div class="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                                    <p class="text-base text-gray-900 dark:text-white whitespace-pre-line">{{ profile.description }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button type="button" data-modal-target="profile-modal" data-modal-toggle="profile-modal" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    <i class="fas fa-edit mr-2"></i>Edit Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-10">
+                        <i class="fas fa-globe text-5xl text-gray-400 dark:text-gray-500 mb-4"></i>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Profile Found</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">Create a profile to display on your portfolio website.</p>
+                        <button type="button" data-modal-target="profile-modal" data-modal-toggle="profile-modal" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            <i class="fas fa-plus mr-2"></i>Create Profile
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

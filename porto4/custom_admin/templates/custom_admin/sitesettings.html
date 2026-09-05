@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for SiteSettings model
+    window.templateFields = ['site_name', 'site_description', 'site_keywords', 'contact_email', 'contact_phone', 'address', 'facebook_url', 'twitter_url', 'linkedin_url', 'github_url', 'instagram_url', 'google_analytics_id', 'favicon', 'logo', 'maintenance_mode'];
+</script>
+{% endblock %}

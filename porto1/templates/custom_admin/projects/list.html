@@ -1,0 +1,277 @@
+{% extends 'custom_admin/layouts/base.html' %}
+
+{% block title %}Daftar Proyek{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8">
+    <div class="sm:flex sm:items-center sm:justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Daftar Proyek</h2>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Kelola proyek yang ditampilkan di portfolio Anda.</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button type="button" data-modal-url="{% url 'custom_admin:project_modal_create' %}" 
+                    class="open-modal inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800">
+                <i class="fas fa-plus mr-2"></i> Tambah Proyek
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter & Search -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+        <div class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Search -->
+                <div class="col-span-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cari</label>
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" name="search" id="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Cari proyek..." value="{{ search }}">
+                    </div>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="col-span-1">
+                    <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
+                    <select id="category" name="category" class="block w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
+                        <option value="">Semua Kategori</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="col-span-1">
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                    <select id="status" name="status" class="block w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
+                        <option value="">Semua Status</option>
+                        <option value="active" {% if status == 'active' %}selected{% endif %}>Aktif</option>
+                        <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Nonaktif</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+                <button type="button" id="reset-filter" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800 mr-3">
+                    <i class="fas fa-undo mr-2"></i> Reset
+                </button>
+                <button type="button" id="apply-filter" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800">
+                    <i class="fas fa-filter mr-2"></i> Terapkan Filter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for project in projects %}
+        <div id="project-card-{{ project.id }}" class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="relative">
+                {% if project.image %}
+                <img src="{{ project.image.url }}" alt="{{ project.title }}" class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <i class="fas fa-project-diagram text-gray-400 text-4xl"></i>
+                </div>
+                {% endif %}
+                <div class="absolute top-2 right-2 flex space-x-2">
+                    <button type="button" data-id="{{ project.id }}" data-url="{% url 'custom_admin:project_toggle_featured' project.id %}" class="toggle-featured p-1.5 rounded-full {% if project.is_featured %}bg-yellow-500 text-white{% else %}bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400{% endif %} hover:bg-yellow-600 hover:text-white">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    <button type="button" data-id="{{ project.id }}" data-url="{% url 'custom_admin:project_toggle_status' project.id %}" class="toggle-status p-1.5 rounded-full {% if project.is_active %}bg-green-500 text-white{% else %}bg-red-500 text-white{% endif %} hover:opacity-80">
+                        <i class="fas {% if project.is_active %}fa-check{% else %}fa-times{% endif %}"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ project.title }}</h3>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        {{ project.category }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">{{ project.description }}</p>
+                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <i class="fas fa-calendar-alt mr-1"></i>
+                    <span>{{ project.date|date:"M Y" }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="flex space-x-2">
+                        {% if project.demo_url %}
+                        <a href="{{ project.demo_url }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        {% endif %}
+                        {% if project.github_url %}
+                        <a href="{{ project.github_url }}" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="flex space-x-2">
+                        <button type="button" data-modal-url="{% url 'custom_admin:project_modal_edit' project.id %}" class="open-modal text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" data-id="{{ project.id }}" data-url="{% url 'custom_admin:project_ajax_delete' project.id %}" class="delete-item text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-center">
+            <div class="flex flex-col items-center">
+                <div class="rounded-full bg-gray-100 dark:bg-gray-700 p-6 mb-4">
+                    <i class="fas fa-project-diagram text-gray-400 text-4xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Tidak ada proyek</h3>
+                <p class="text-gray-500 dark:text-gray-400 mb-4">Anda belum menambahkan proyek apapun.</p>
+                <button type="button" data-modal-url="{% url 'custom_admin:project_modal_create' %}" class="open-modal inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-800">
+                    <i class="fas fa-plus mr-2"></i> Tambah Proyek Pertama
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if projects.has_other_pages %}
+    <div class="mt-6 bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 rounded-lg shadow">
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    Menampilkan <span class="font-medium">{{ projects.start_index }}</span> sampai <span class="font-medium">{{ projects.end_index }}</span> dari <span class="font-medium">{{ paginator.count }}</span> hasil
+                </p>
+            </div>
+            <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    {% if projects.has_previous %}
+                    <a href="?page={{ projects.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if status %}&status={{ status }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    {% else %}
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-400 dark:text-gray-500">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                    {% endif %}
+                    
+                    {% for i in paginator.page_range %}
+                        {% if projects.number == i %}
+                        <span class="relative inline-flex items-center px-4 py-2 border border-primary-500 dark:border-primary-600 bg-primary-50 dark:bg-primary-900 text-sm font-medium text-primary-600 dark:text-primary-300">
+                            {{ i }}
+                        </span>
+                        {% else %}
+                        <a href="?page={{ i }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if status %}&status={{ status }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            {{ i }}
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if projects.has_next %}
+                    <a href="?page={{ projects.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if status %}&status={{ status }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% else %}
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-400 dark:text-gray-500">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal Container -->
+<div id="modal-container"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const searchInput = document.getElementById('search');
+        const categorySelect = document.getElementById('category');
+        const statusSelect = document.getElementById('status');
+        const applyFilterBtn = document.getElementById('apply-filter');
+        const resetFilterBtn = document.getElementById('reset-filter');
+
+        applyFilterBtn.addEventListener('click', function() {
+            const searchValue = searchInput.value.trim();
+            const categoryValue = categorySelect.value;
+            const statusValue = statusSelect.value;
+            
+            let url = window.location.pathname + '?';
+            if (searchValue) url += `search=${encodeURIComponent(searchValue)}&`;
+            if (categoryValue) url += `category=${encodeURIComponent(categoryValue)}&`;
+            if (statusValue) url += `status=${encodeURIComponent(statusValue)}&`;
+            
+            // Remove trailing '&' or '?' if present
+            url = url.replace(/[&?]$/, '');
+            
+            window.location.href = url;
+        });
+
+        resetFilterBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            categorySelect.value = '';
+            statusSelect.value = '';
+            window.location.href = window.location.pathname;
+        });
+
+        // Allow pressing Enter to apply filter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilterBtn.click();
+            }
+        });
+
+        // Toggle featured status
+        document.querySelectorAll('.toggle-featured').forEach(button => {
+            button.addEventListener('click', function() {
+                const projectId = this.dataset.id;
+                const url = this.dataset.url;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update button appearance
+                        if (data.is_featured) {
+                            this.classList.remove('bg-gray-200', 'text-gray-500', 'dark:bg-gray-700', 'dark:text-gray-400');
+                            this.classList.add('bg-yellow-500', 'text-white');
+                        } else {
+                            this.classList.remove('bg-yellow-500', 'text-white');
+                            this.classList.add('bg-gray-200', 'text-gray-500', 'dark:bg-gray-700', 'dark:text-gray-400');
+                        }
+                        
+                        // Show success message
+                        showToast('success', data.message);
+                    } else {
+                        showToast('error', data.message || 'Terjadi kesalahan. Silakan coba lagi.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

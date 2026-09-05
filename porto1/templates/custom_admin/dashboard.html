@@ -1,0 +1,218 @@
+{% extends 'custom_admin/layouts/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8">
+    <div class="sm:flex sm:items-center sm:justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Selamat datang di panel admin portfolio Anda.</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Projects Stats -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-primary-100 dark:bg-primary-900 rounded-md p-3">
+                        <i class="fas fa-project-diagram text-primary-600 dark:text-primary-400 text-xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Proyek</dt>
+                            <dd>
+                                <div class="text-lg font-medium text-gray-900 dark:text-white">{{ project_count }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                <div class="text-sm">
+                    <a href="{% url 'custom_admin:project_list' %}" class="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                        Lihat semua
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills Stats -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-indigo-100 dark:bg-indigo-900 rounded-md p-3">
+                        <i class="fas fa-code text-indigo-600 dark:text-indigo-400 text-xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Keahlian</dt>
+                            <dd>
+                                <div class="text-lg font-medium text-gray-900 dark:text-white">{{ skill_count }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                <div class="text-sm">
+                    <a href="{% url 'custom_admin:skill_list' %}" class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">
+                        Lihat semua
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience Stats -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 dark:bg-green-900 rounded-md p-3">
+                        <i class="fas fa-briefcase text-green-600 dark:text-green-400 text-xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Pengalaman</dt>
+                            <dd>
+                                <div class="text-lg font-medium text-gray-900 dark:text-white">{{ experience_count }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                <div class="text-sm">
+                    <a href="{% url 'custom_admin:experience_list' %}" class="font-medium text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300">
+                        Lihat semua
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Stats -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-red-100 dark:bg-red-900 rounded-md p-3">
+                        <i class="fas fa-envelope text-red-600 dark:text-red-400 text-xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Pesan Baru</dt>
+                            <dd>
+                                <div class="text-lg font-medium text-gray-900 dark:text-white">{{ unread_contact_count }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                <div class="text-sm">
+                    <a href="{% url 'custom_admin:contact_list' %}" class="font-medium text-red-600 dark:text-red-400 hover:text-red-500 dark:hover:text-red-300">
+                        Lihat semua
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Projects -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Proyek Terbaru</h3>
+                <a href="{% url 'custom_admin:project_list' %}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                    Lihat semua
+                </a>
+            </div>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% if recent_projects %}
+                    {% for project in recent_projects %}
+                    <div class="px-5 py-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                {% if project.image %}
+                                <div class="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
+                                    <img src="{{ project.image.url }}" alt="{{ project.title }}" class="h-10 w-10 object-cover">
+                                </div>
+                                {% else %}
+                                <div class="flex-shrink-0 h-10 w-10 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    <i class="fas fa-project-diagram text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                {% endif %}
+                                <div class="ml-4">
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ project.title }}</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ project.created_at|date:"d M Y" }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if project.is_active %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                                    {% if project.is_active %}Aktif{% else %}Nonaktif{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="px-5 py-4 text-center text-gray-500 dark:text-gray-400">
+                    <p>Belum ada proyek yang ditambahkan.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Messages -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Pesan Terbaru</h3>
+                <a href="{% url 'custom_admin:contact_list' %}" class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                    Lihat semua
+                </a>
+            </div>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% if recent_contacts %}
+                    {% for contact in recent_contacts %}
+                    <div class="px-5 py-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ contact.name }}</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ contact.created_at|date:"d M Y" }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if contact.status == 'read' %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200{% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                                    {% if contact.status == 'read' %}Dibaca{% else %}Belum dibaca{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ contact.message }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="px-5 py-4 text-center text-gray-500 dark:text-gray-400">
+                    <p>Belum ada pesan yang diterima.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Dashboard specific JavaScript can be added here
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard loaded');
+    });
+</script>
+{% endblock %}

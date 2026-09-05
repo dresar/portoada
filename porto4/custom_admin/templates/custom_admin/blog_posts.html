@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for BlogPost model
+    window.templateFields = ['title', 'slug', 'category', 'tags', 'content', 'excerpt', 'featured_image', 'status', 'is_featured', 'published_at', 'meta_description', 'meta_keywords'];
+</script>
+{% endblock %}

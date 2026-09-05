@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Statistic model
+    window.templateFields = ['user', 'label', 'value', 'suffix', 'icon_class', 'color', 'display_order', 'is_active'];
+</script>
+{% endblock %}

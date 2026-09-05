@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for User model
+    window.templateFields = ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'is_superuser'];
+</script>
+{% endblock %}

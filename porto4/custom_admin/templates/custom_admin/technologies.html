@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Technology model
+    window.templateFields = ['name', 'category', 'description', 'icon', 'color', 'proficiency_level', 'years_of_experience', 'is_featured', 'display_order'];
+</script>
+{% endblock %}

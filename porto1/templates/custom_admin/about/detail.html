@@ -1,0 +1,504 @@
+{% extends 'custom_admin/layouts/base.html' %}
+
+{% block title %}About - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+        <div class="mb-4">
+            <nav class="flex mb-5" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                            <i class="fas fa-home mr-2.5"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-400 dark:text-gray-500">About</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">About</h1>
+        </div>
+    </div>
+</div>
+
+<div class="flex flex-col">
+    <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden shadow">
+                <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    {% if about %}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Left Column - Image -->
+                        <div class="md:col-span-1">
+                            <div class="flex flex-col items-center">
+                                {% if about.image %}
+                                <img src="{{ about.image.url }}" alt="{{ about.name }}" class="w-full h-auto max-w-xs rounded-lg shadow-md mb-4">
+                                {% else %}
+                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg shadow-md mb-4 dark:bg-gray-700">
+                                    <i class="fas fa-user text-4xl text-gray-400 dark:text-gray-500"></i>
+                                </div>
+                                {% endif %}
+                                <button type="button" data-modal-target="about-modal" data-modal-toggle="about-modal" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    <i class="fas fa-edit mr-2"></i>Edit About
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column - Details -->
+                        <div class="md:col-span-2">
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ about.name }}</h2>
+                                <p class="text-lg text-gray-700 dark:text-gray-300">{{ about.title }}</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">
+                                        <a href="mailto:{{ about.email }}" class="text-primary-600 dark:text-primary-500 hover:underline">{{ about.email }}</a>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">{{ about.phone }}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Location</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">{{ about.location }}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Availability</h3>
+                                    <p class="text-base text-gray-900 dark:text-white">{{ about.availability }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Short Bio</h3>
+                                <p class="text-base text-gray-900 dark:text-white">{{ about.short_description }}</p>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Description</h3>
+                                <div class="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                                    <p class="text-base text-gray-900 dark:text-white whitespace-pre-line">{{ about.description }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Social Media</h3>
+                                <div class="flex flex-wrap gap-3">
+                                    {% if about.github %}
+                                    <a href="{{ about.github }}" target="_blank" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                                        <i class="fab fa-github text-xl"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if about.linkedin %}
+                                    <a href="{{ about.linkedin }}" target="_blank" class="text-blue-600 hover:text-blue-700 dark:hover:text-blue-400">
+                                        <i class="fab fa-linkedin text-xl"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if about.twitter %}
+                                    <a href="{{ about.twitter }}" target="_blank" class="text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
+                                        <i class="fab fa-twitter text-xl"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if about.facebook %}
+                                    <a href="{{ about.facebook }}" target="_blank" class="text-blue-700 hover:text-blue-800 dark:hover:text-blue-500">
+                                        <i class="fab fa-facebook text-xl"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if about.instagram %}
+                                    <a href="{{ about.instagram }}" target="_blank" class="text-pink-600 hover:text-pink-700 dark:hover:text-pink-400">
+                                        <i class="fab fa-instagram text-xl"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if about.youtube %}
+                                    <a href="{{ about.youtube }}" target="_blank" class="text-red-600 hover:text-red-700 dark:hover:text-red-400">
+                                        <i class="fab fa-youtube text-xl"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Resume</h3>
+                                {% if about.resume %}
+                                <a href="{{ about.resume.url }}" target="_blank" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    <i class="fas fa-file-pdf mr-2"></i>Download Resume
+                                </a>
+                                {% else %}
+                                <p class="text-base text-gray-500 dark:text-gray-400">No resume uploaded</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-10">
+                        <i class="fas fa-user-circle text-6xl text-gray-400 mb-4 dark:text-gray-600"></i>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No About Information</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">You haven't added your about information yet.</p>
+                        <button type="button" data-modal-target="about-modal" data-modal-toggle="about-modal" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            <i class="fas fa-plus mr-2"></i>Add About Information
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Modal -->
+<div id="about-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 items-center justify-center hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-4xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    {% if about %}Edit{% else %}Add{% endif %} About Information
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="about-modal">
+                    <i class="fas fa-times"></i>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
+                <form id="about-form" method="post" enctype="multipart/form-data" data-action="{% if about %}{% url 'custom_admin:about_ajax_update' about.id %}{% else %}{% url 'custom_admin:about_ajax_create' %}{% endif %}">
+                    {% csrf_token %}
+                    
+                    <div class="grid gap-6 mb-6 md:grid-cols-2">
+                        <!-- Name -->
+                        <div>
+                            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="name" name="name" value="{{ about.name|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your full name" required>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="name-error"></p>
+                        </div>
+                        
+                        <!-- Title -->
+                        <div>
+                            <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title <span class="text-red-500">*</span></label>
+                            <input type="text" id="title" name="title" value="{{ about.title|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="e.g. Full Stack Developer" required>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="title-error"></p>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" name="email" value="{{ about.email|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="your.email@example.com" required>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="email-error"></p>
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div>
+                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                            <input type="text" id="phone" name="phone" value="{{ about.phone|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="+1 (123) 456-7890">
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="phone-error"></p>
+                        </div>
+                        
+                        <!-- Location -->
+                        <div>
+                            <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Location</label>
+                            <input type="text" id="location" name="location" value="{{ about.location|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="City, Country">
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="location-error"></p>
+                        </div>
+                        
+                        <!-- Availability -->
+                        <div>
+                            <label for="availability" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Availability</label>
+                            <input type="text" id="availability" name="availability" value="{{ about.availability|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="e.g. Available for freelance">
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="availability-error"></p>
+                        </div>
+                        
+                        <!-- Short Description -->
+                        <div class="col-span-2">
+                            <label for="short_description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Short Bio <span class="text-red-500">*</span></label>
+                            <textarea id="short_description" name="short_description" rows="2" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Brief introduction (1-2 sentences)" required>{{ about.short_description|default:'' }}</textarea>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="short_description-error"></p>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="col-span-2">
+                            <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description <span class="text-red-500">*</span></label>
+                            <textarea id="description" name="description" rows="6" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Detailed description about yourself" required>{{ about.description|default:'' }}</textarea>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="description-error"></p>
+                        </div>
+                        
+                        <!-- Social Media Links -->
+                        <div>
+                            <label for="github" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">GitHub</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-github"></i>
+                                </span>
+                                <input type="url" id="github" name="github" value="{{ about.github|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://github.com/username">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="github-error"></p>
+                        </div>
+                        
+                        <div>
+                            <label for="linkedin" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">LinkedIn</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-linkedin"></i>
+                                </span>
+                                <input type="url" id="linkedin" name="linkedin" value="{{ about.linkedin|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://linkedin.com/in/username">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="linkedin-error"></p>
+                        </div>
+                        
+                        <div>
+                            <label for="twitter" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Twitter</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-twitter"></i>
+                                </span>
+                                <input type="url" id="twitter" name="twitter" value="{{ about.twitter|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://twitter.com/username">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="twitter-error"></p>
+                        </div>
+                        
+                        <div>
+                            <label for="facebook" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Facebook</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-facebook"></i>
+                                </span>
+                                <input type="url" id="facebook" name="facebook" value="{{ about.facebook|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://facebook.com/username">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="facebook-error"></p>
+                        </div>
+                        
+                        <div>
+                            <label for="instagram" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Instagram</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-instagram"></i>
+                                </span>
+                                <input type="url" id="instagram" name="instagram" value="{{ about.instagram|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://instagram.com/username">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="instagram-error"></p>
+                        </div>
+                        
+                        <div>
+                            <label for="youtube" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">YouTube</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    <i class="fab fa-youtube"></i>
+                                </span>
+                                <input type="url" id="youtube" name="youtube" value="{{ about.youtube|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="https://youtube.com/c/channelname">
+                            </div>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="youtube-error"></p>
+                        </div>
+                        
+                        <!-- Image -->
+                        <div class="col-span-2">
+                            <label for="image" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Image</label>
+                            <input type="file" id="image" name="image" accept="image/*" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">PNG, JPG or JPEG (MAX. 2MB)</p>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="image-error"></p>
+                            
+                            {% if about.image %}
+                            <div class="mt-2 flex items-center space-x-2">
+                                <img src="{{ about.image.url }}" alt="{{ about.name }}" class="h-16 w-16 object-cover rounded-full border dark:border-gray-700">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    <p>Current image</p>
+                                    <div class="flex items-center mt-1">
+                                        <input id="keep_image" type="checkbox" name="keep_image" value="yes" checked class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="keep_image" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Keep this image</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Resume -->
+                        <div class="col-span-2">
+                            <label for="resume" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Resume</label>
+                            <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">PDF, DOC or DOCX (MAX. 5MB)</p>
+                            <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="resume-error"></p>
+                            
+                            {% if about.resume %}
+                            <div class="mt-2 flex items-center space-x-2">
+                                <i class="fas fa-file-pdf text-red-500 text-2xl"></i>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    <p>Current resume</p>
+                                    <div class="flex items-center mt-1">
+                                        <input id="keep_resume" type="checkbox" name="keep_resume" value="yes" checked class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="keep_resume" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Keep this resume</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Form Error Message -->
+                    <div id="form-error" class="hidden p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                        <span class="font-medium">Error!</span> <span id="form-error-message"></span>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <button type="button" data-modal-hide="about-modal" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </button>
+                <button type="button" id="submit-about-form" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <i class="fas fa-save mr-2"></i>Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Submit form button
+        const submitButton = document.getElementById('submit-about-form');
+        submitButton.addEventListener('click', function() {
+            const form = document.getElementById('about-form');
+            submitForm(form);
+        });
+        
+        // File input change events
+        const imageInput = document.getElementById('image');
+        if (imageInput) {
+            imageInput.addEventListener('change', function() {
+                const keepImageCheckbox = document.getElementById('keep_image');
+                if (keepImageCheckbox && this.files.length > 0) {
+                    keepImageCheckbox.checked = false;
+                }
+            });
+        }
+        
+        const resumeInput = document.getElementById('resume');
+        if (resumeInput) {
+            resumeInput.addEventListener('change', function() {
+                const keepResumeCheckbox = document.getElementById('keep_resume');
+                if (keepResumeCheckbox && this.files.length > 0) {
+                    keepResumeCheckbox.checked = false;
+                }
+            });
+        }
+    });
+    
+    // Submit form via AJAX
+    function submitForm(form) {
+        // Clear previous error messages
+        clearErrors();
+        
+        // Get form data
+        const formData = new FormData(form);
+        const actionUrl = form.getAttribute('data-action');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Check if keep_image checkbox exists and is unchecked
+        const keepImageCheckbox = document.getElementById('keep_image');
+        if (keepImageCheckbox && !keepImageCheckbox.checked) {
+            formData.append('remove_image', 'yes');
+        }
+        
+        // Check if keep_resume checkbox exists and is unchecked
+        const keepResumeCheckbox = document.getElementById('keep_resume');
+        if (keepResumeCheckbox && !keepResumeCheckbox.checked) {
+            formData.append('remove_resume', 'yes');
+        }
+        
+        // Submit form
+        fetch(actionUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Close modal
+                closeModal('about-modal');
+                
+                // Show success message
+                showToast('success', data.message);
+                
+                // Reload page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                // Show error messages
+                if (data.errors) {
+                    displayErrors(data.errors);
+                } else {
+                    // Show general error message
+                    const formError = document.getElementById('form-error');
+                    const formErrorMessage = document.getElementById('form-error-message');
+                    formErrorMessage.textContent = data.message || 'An error occurred. Please try again.';
+                    formError.classList.remove('hidden');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+            
+            // Show error message
+            const formError = document.getElementById('form-error');
+            const formErrorMessage = document.getElementById('form-error-message');
+            formErrorMessage.textContent = 'An error occurred while submitting the form. Please try again.';
+            formError.classList.remove('hidden');
+        });
+    }
+    
+    // Display field-specific errors
+    function displayErrors(errors) {
+        for (const field in errors) {
+            const errorElement = document.getElementById(`${field}-error`);
+            if (errorElement) {
+                errorElement.textContent = errors[field].join(' ');
+                errorElement.classList.remove('hidden');
+            }
+        }
+        
+        // If there are non-field errors, display them in the form error section
+        if (errors.non_field_errors) {
+            const formError = document.getElementById('form-error');
+            const formErrorMessage = document.getElementById('form-error-message');
+            formErrorMessage.textContent = errors.non_field_errors.join(' ');
+            formError.classList.remove('hidden');
+        }
+    }
+    
+    // Clear all error messages
+    function clearErrors() {
+        // Hide form error
+        const formError = document.getElementById('form-error');
+        formError.classList.add('hidden');
+        
+        // Hide field errors
+        const errorElements = document.querySelectorAll('.error-message');
+        errorElements.forEach(element => {
+            element.textContent = '';
+            element.classList.add('hidden');
+        });
+    }
+</script>
+{% endblock %}

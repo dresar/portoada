@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonials Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Client Testimonials</h1>
+        
+        <div class="max-w-6xl mx-auto">
+            <!-- Testimonials Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for testimonial in testimonials %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg p-6">
+                    <!-- Quote Icon -->
+                    <div class="text-gray-200 mb-4">
+                        <i class="fas fa-quote-left text-4xl"></i>
+                    </div>
+                    
+                    <!-- Testimonial Content -->
+                    <p class="text-gray-600 italic mb-6">{{ testimonial.content }}</p>
+                    
+                    <!-- Client Info -->
+                    <div class="flex items-center">
+                        <!-- Client Image -->
+                        {% if testimonial.client_image %}
+                        <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+                            <img src="{{ testimonial.client_image.url }}" alt="{{ testimonial.client_name }}" class="w-full h-full object-cover">
+                        </div>
+                        {% else %}
+                        <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Client Details -->
+                        <div>
+                            <h3 class="font-bold text-gray-800">{{ testimonial.client_name }}</h3>
+                            {% if testimonial.client_position and testimonial.client_company %}
+                            <p class="text-sm text-gray-500">{{ testimonial.client_position }}, {{ testimonial.client_company }}</p>
+                            {% elif testimonial.client_position %}
+                            <p class="text-sm text-gray-500">{{ testimonial.client_position }}</p>
+                            {% elif testimonial.client_company %}
+                            <p class="text-sm text-gray-500">{{ testimonial.client_company }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Rating Stars -->
+                    {% if testimonial.rating %}
+                    <div class="mt-4 flex">
+                        {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= testimonial.rating %}
+                        <i class="fas fa-star text-yellow-400"></i>
+                        {% else %}
+                        <i class="far fa-star text-yellow-400"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="col-span-full bg-white rounded-lg shadow-md p-8 text-center">
+                    <p class="text-gray-500">No testimonials found.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <a href="{% url 'portfolio_admin:testimonial_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Admin
+            </a>
+        </div>
+    </div>
+</body>
+</html>

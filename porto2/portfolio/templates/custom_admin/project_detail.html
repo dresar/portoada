@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+        
+        .model-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .model-viewer {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .model-controls {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .model-control-btn {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #1f2937;
+            border-radius: 9999px;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .model-control-btn:hover {
+            background-color: rgba(255, 255, 255, 1);
+            transform: scale(1.05);
+        }
+        
+        .gallery-image {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        
+        .gallery-image:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2rem;
+            transform: translateY(-50%);
+        }
+        
+        .lightbox-nav-btn {
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.5);
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">Project Details</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                            <i class="fas fa-home mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <a href="{% url 'custom_admin:project_list' %}" class="text-gray-700 hover:text-blue-600">
+                                Projects
+                            </a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-500">{{ project.title }}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Action Buttons -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">{{ project.title }}</h2>
+                
+                <div class="flex space-x-3">
+                    <a href="{% url 'custom_admin:project_edit' project.id %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                        <i class="fas fa-edit mr-2"></i> Edit
+                    </a>
+                    
+                    <button type="button" id="delete-button" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                    </button>
+                    
+                    <a href="{% url 'main_app:project_detail' project.slug %}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                        <i class="fas fa-eye mr-2"></i> View Live
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Project Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column - 3D Model and Gallery -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- 3D Model Viewer -->
+                    {% if project.model_3d %}
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">3D Model</h3>
+                        </div>
+                        
+                        <div class="model-container">
+                            <div id="model-viewer" class="model-viewer"></div>
+                            
+                            <div class="model-controls">
+                                <div class="model-control-btn" id="rotate-left">
+                                    <i class="fas fa-undo"></i>
+                                </div>
+                                <div class="model-control-btn" id="rotate-right">
+                                    <i class="fas fa-redo"></i>
+                                </div>
+                                <div class="model-control-btn" id="zoom-in">
+                                    <i class="fas fa-search-plus"></i>
+                                </div>
+                                <div class="model-control-btn" id="zoom-out">
+                                    <i class="fas fa-search-minus"></i>
+                                </div>
+                                <div class="model-control-btn" id="reset-view">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">{{ project.model_3d.name }}</span>
+                                <a href="{{ project.model_3d.url }}" download class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    <i class="fas fa-download mr-1"></i> Download Model
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Project Gallery -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">Project Gallery</h3>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <!-- Featured Image -->
+                                <div class="gallery-image rounded-lg overflow-hidden shadow-sm">
+                                    <img src="{{ project.image.url }}" alt="{{ project.title }}" class="w-full h-40 object-cover" data-index="0">
+                                </div>
+                                
+                                <!-- Gallery Images -->
+                                {% for image in gallery_images %}
+                                <div class="gallery-image rounded-lg overflow-hidden shadow-sm">
+                                    <img src="{{ image.image.url }}" alt="Gallery image {{ forloop.counter }}" class="w-full h-40 object-cover" data-index="{{ forloop.counter }}">
+                                </div>
+                                {% empty %}
+                                <!-- Example Gallery Images (for demonstration) -->
+                                <div class="gallery-image rounded-lg overflow-hidden shadow-sm">
+                                    <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example image 1" class="w-full h-40 object-cover" data-index="1">
+                                </div>
+                                <div class="gallery-image rounded-lg overflow-hidden shadow-sm">
+                                    <img src="https://images.unsplash.com/photo-1590274853856-f22d5ee3d228?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example image 2" class="w-full h-40 object-cover" data-index="2">
+                                </div>
+                                <div class="gallery-image rounded-lg overflow-hidden shadow-sm">
+                                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example image 3" class="w-full h-40 object-cover" data-index="3">
+                                </div>
+                                <div class="gallery-image rounded-lg overflow-hidden shadow-sm">
+                                    <img src="https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example image 4" class="w-full h-40 object-cover" data-index="4">
+                                </div>
+                                <div class="gallery-image rounded-lg overflow-hidden shadow-sm">
+                                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example image 5" class="w-full h-40 object-cover" data-index="5">
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Description -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">Project Description</h3>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="prose max-w-none">
+                                {{ project.description|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Project Info -->
+                <div class="space-y-6">
+                    <!-- Project Status -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">Project Status</h3>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Status</span>
+                                <span class="px-3 py-1 rounded-full text-sm font-medium
+                                    {% if project.status == 'completed' %}
+                                        bg-green-100 text-green-800
+                                    {% elif project.status == 'in_progress' %}
+                                        bg-blue-100 text-blue-800
+                                    {% else %}
+                                        bg-yellow-100 text-yellow-800
+                                    {% endif %}
+                                ">
+                                    {{ project.get_status_display }}
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Category</span>
+                                <span class="text-gray-800 font-medium">{{ project.category.name }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Client</span>
+                                <span class="text-gray-800">{{ project.client|default:"Not specified" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Location</span>
+                                <span class="text-gray-800">{{ project.location|default:"Not specified" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Completion Date</span>
+                                <span class="text-gray-800">{{ project.date|date:"F j, Y"|default:"Not specified" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-gray-600">Project URL</span>
+                                {% if project.url %}
+                                <a href="{{ project.url }}" target="_blank" class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-external-link-alt mr-1"></i> Visit
+                                </a>
+                                {% else %}
+                                <span class="text-gray-500">Not specified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Technologies Used -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">Technologies Used</h3>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="flex flex-wrap gap-2">
+                                {% if project.technologies %}
+                                    {% for tech in project.technologies_list %}
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">{{ tech }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Concrete</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Steel</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">BIM</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">AutoCAD</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Revit</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Statistics -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">Project Statistics</h3>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Created</span>
+                                <span class="text-gray-800">{{ project.created_at|date:"F j, Y" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Last Updated</span>
+                                <span class="text-gray-800">{{ project.updated_at|date:"F j, Y" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2 border-b">
+                                <span class="text-gray-600">Views</span>
+                                <span class="text-gray-800">{{ project.views|default:"0" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-gray-600">Featured</span>
+                                <span class="text-gray-800">
+                                    {% if project.is_featured %}
+                                    <i class="fas fa-check-circle text-green-500"></i> Yes
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-red-500"></i> No
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Related Projects -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">Related Projects</h3>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="space-y-4">
+                                {% for related in related_projects %}
+                                <a href="{% url 'custom_admin:project_detail' related.id %}" class="flex items-center p-2 hover:bg-gray-50 rounded-md transition duration-200">
+                                    <img src="{{ related.image.url }}" alt="{{ related.title }}" class="w-12 h-12 object-cover rounded">
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-800">{{ related.title }}</h4>
+                                        <p class="text-xs text-gray-500">{{ related.category.name }}</p>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <!-- Example Related Projects (for demonstration) -->
+                                <a href="#" class="flex items-center p-2 hover:bg-gray-50 rounded-md transition duration-200">
+                                    <img src="https://images.unsplash.com/photo-1590274853856-f22d5ee3d228?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example related project 1" class="w-12 h-12 object-cover rounded">
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-800">City Bridge Project</h4>
+                                        <p class="text-xs text-gray-500">Infrastructure</p>
+                                    </div>
+                                </a>
+                                <a href="#" class="flex items-center p-2 hover:bg-gray-50 rounded-md transition duration-200">
+                                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example related project 2" class="w-12 h-12 object-cover rounded">
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-800">Modern Office Building</h4>
+                                        <p class="text-xs text-gray-500">Commercial</p>
+                                    </div>
+                                </a>
+                                <a href="#" class="flex items-center p-2 hover:bg-gray-50 rounded-md transition duration-200">
+                                    <img src="https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example related project 3" class="w-12 h-12 object-cover rounded">
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-800">Highway Expansion</h4>
+                                        <p class="text-xs text-gray-500">Infrastructure</p>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Lightbox for Gallery Images -->
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" class="lightbox-content">
+        <div class="lightbox-nav">
+            <span class="lightbox-nav-btn" id="lightbox-prev"><i class="fas fa-chevron-left"></i></span>
+            <span class="lightbox-nav-btn" id="lightbox-next"><i class="fas fa-chevron-right"></i></span>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+                <p class="text-gray-700 mb-6">Are you sure you want to delete this project? This action cannot be undone.</p>
+                
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-delete" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                        Cancel
+                    </button>
+                    
+                    <form method="post" action="{% url 'custom_admin:project_delete' project.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Three.js for 3D model viewer -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // Delete confirmation modal
+        const deleteButton = document.getElementById('delete-button');
+        const deleteModal = document.getElementById('delete-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        
+        deleteButton.addEventListener('click', () => {
+            deleteModal.classList.remove('hidden');
+        });
+        
+        cancelDelete.addEventListener('click', () => {
+            deleteModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        deleteModal.addEventListener('click', (event) => {
+            if (event.target === deleteModal) {
+                deleteModal.classList.add('hidden');
+            }
+        });
+        
+        // Gallery lightbox
+        const galleryImages = document.querySelectorAll('.gallery-image img');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxClose = document.querySelector('.lightbox-close');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
+        let currentImageIndex = 0;
+        
+        galleryImages.forEach(img => {
+            img.addEventListener('click', () => {
+                lightbox.style.display = 'flex';
+                lightboxImg.src = img.src;
+                currentImageIndex = parseInt(img.dataset.index);
+            });
+        });
+        
+        lightboxClose.addEventListener('click', () => {
+            lightbox.style.display = 'none';
+        });
+        
+        lightboxPrev.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+            lightboxImg.src = galleryImages[currentImageIndex].src;
+        });
+        
+        lightboxNext.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+            lightboxImg.src = galleryImages[currentImageIndex].src;
+        });
+        
+        // Close lightbox when clicking outside the image
+        lightbox.addEventListener('click', (event) => {
+            if (event.target === lightbox) {
+                lightbox.style.display = 'none';
+            }
+        });
+        
+        // 3D Model Viewer
+        {% if project.model_3d %}
+        const modelViewer = document.getElementById('model-viewer');
+        if (modelViewer) {
+            let scene, camera, renderer, controls, model;
+            
+            function initThree() {
+                // Create scene
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xf3f4f6);
+                
+                // Create camera
+                camera = new THREE.PerspectiveCamera(75, modelViewer.clientWidth / modelViewer.clientHeight, 0.1, 1000);
+                camera.position.z = 5;
+                
+                // Create renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(modelViewer.clientWidth, modelViewer.clientHeight);
+                renderer.outputEncoding = THREE.sRGBEncoding;
+                modelViewer.appendChild(renderer.domElement);
+                
+                // Add controls
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.25;
+                
+                // Add lights
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(1, 1, 1);
+                scene.add(directionalLight);
+                
+                // Load model
+                const loader = new THREE.GLTFLoader();
+                loader.load('{{ project.model_3d.url }}', function(gltf) {
+                    model = gltf.scene;
+                    scene.add(model);
+                    
+                    // Center model
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+                    
+                    model.position.x -= center.x;
+                    model.position.y -= center.y;
+                    model.position.z -= center.z;
+                    
+                    // Adjust camera
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const fov = camera.fov * (Math.PI / 180);
+                    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                    cameraZ *= 1.5; // Add some margin
+                    camera.position.z = cameraZ;
+                    
+                    const minZ = box.min.z;
+                    const cameraToFarEdge = (minZ < 0) ? -minZ + cameraZ : cameraZ - minZ;
+                    camera.far = cameraToFarEdge * 3;
+                    camera.updateProjectionMatrix();
+                });
+                
+                // Animation loop
+                function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update();
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                
+                // Handle window resize
+                window.addEventListener('resize', onWindowResize, false);
+                function onWindowResize() {
+                    camera.aspect = modelViewer.clientWidth / modelViewer.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(modelViewer.clientWidth, modelViewer.clientHeight);
+                }
+                
+                // Model controls
+                document.getElementById('rotate-left').addEventListener('click', () => {
+                    if (model) {
+                        model.rotation.y -= Math.PI / 8;
+                    }
+                });
+                
+                document.getElementById('rotate-right').addEventListener('click', () => {
+                    if (model) {
+                        model.rotation.y += Math.PI / 8;
+                    }
+                });
+                
+                document.getElementById('zoom-in').addEventListener('click', () => {
+                    camera.position.z *= 0.9;
+                });
+                
+                document.getElementById('zoom-out').addEventListener('click', () => {
+                    camera.position.z *= 1.1;
+                });
+                
+                document.getElementById('reset-view').addEventListener('click', () => {
+                    if (model) {
+                        model.rotation.set(0, 0, 0);
+                        camera.position.z = cameraZ;
+                        controls.reset();
+                    }
+                });
+            }
+            
+            initThree();
+        }
+        {% endif %}
+    </script>
+</body>
+</html>

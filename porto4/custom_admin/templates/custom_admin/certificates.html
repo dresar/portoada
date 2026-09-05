@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Certificate model
+    window.templateFields = ['user', 'name', 'issuing_organization', 'issue_date', 'expiration_date', 'credential_id', 'credential_url', 'description', 'certificate_file'];
+</script>
+{% endblock %}

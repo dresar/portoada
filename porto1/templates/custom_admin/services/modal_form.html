@@ -1,0 +1,197 @@
+<!-- Modal Header -->
+<div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+        {% if service.id %}
+        Edit Layanan
+        {% else %}
+        Tambah Layanan Baru
+        {% endif %}
+    </h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="service-modal">
+        <i class="fas fa-times"></i>
+        <span class="sr-only">Close modal</span>
+    </button>
+</div>
+
+<!-- Modal Body -->
+<div class="p-6 space-y-6">
+    <form id="service-form" method="post" enctype="multipart/form-data" data-action="{% if service.id %}{% url 'custom_admin:service_ajax_update' service.id %}{% else %}{% url 'custom_admin:service_ajax_create' %}{% endif %}">
+        {% csrf_token %}
+        
+        <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <!-- Title -->
+            <div class="col-span-2">
+                <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Judul Layanan <span class="text-red-500">*</span></label>
+                <input type="text" id="title" name="title" value="{{ service.title|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Masukkan judul layanan" required>
+                <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="title-error"></p>
+            </div>
+            
+            <!-- Icon -->
+            <div class="col-span-2">
+                <label for="icon" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ikon <span class="text-red-500">*</span></label>
+                <div class="flex">
+                    <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                        <i class="fas fa-icons"></i>
+                    </span>
+                    <input type="text" id="icon" name="icon" value="{{ service.icon|default:'' }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="fas fa-code" required>
+                </div>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Gunakan kelas ikon dari Font Awesome, contoh: fas fa-code, fas fa-laptop-code</p>
+                <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="icon-error"></p>
+                
+                <!-- Icon Preview -->
+                <div class="mt-3">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Preview Ikon</label>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <i id="icon-preview" class="{{ service.icon|default:'fas fa-question' }} text-xl text-primary-600 dark:text-primary-500"></i>
+                        </div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Preview akan muncul saat Anda mengetik</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="col-span-2">
+                <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Deskripsi <span class="text-red-500">*</span></label>
+                <textarea id="description" name="description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Masukkan deskripsi layanan" required>{{ service.description|default:'' }}</textarea>
+                <p class="error-message text-sm text-red-600 dark:text-red-500 mt-1 hidden" id="description-error"></p>
+            </div>
+            
+            <!-- Status -->
+            <div class="col-span-2">
+                <div class="flex items-center">
+                    <input id="is_active" type="checkbox" name="is_active" value="yes" {% if service.is_active or service.is_active is None %}checked{% endif %} class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <label for="is_active" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Aktif</label>
+                </div>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Layanan yang aktif akan ditampilkan di portfolio</p>
+            </div>
+        </div>
+        
+        <!-- Form Error Message -->
+        <div id="form-error" class="hidden p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+            <span class="font-medium">Terjadi kesalahan!</span> <span id="form-error-message"></span>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="flex items-center justify-end space-x-2 rounded-b border-t border-gray-200 p-6 dark:border-gray-600">
+            <button type="button" data-modal-hide="service-modal" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                <i class="fas fa-times mr-2"></i>Batal
+            </button>
+            <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                <i class="fas fa-save mr-2"></i>Simpan
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Icon preview functionality
+        const iconInput = document.getElementById('icon');
+        const iconPreview = document.getElementById('icon-preview');
+        
+        // Update icon preview when typing
+        iconInput.addEventListener('input', function() {
+            // Remove all classes from the preview icon
+            iconPreview.className = '';
+            // Add the new icon class
+            iconPreview.className = this.value || 'fas fa-question';
+        });
+        
+        // Form submission
+        const form = document.getElementById('service-form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitForm(form);
+        });
+    });
+    
+    // Submit form via AJAX
+    function submitForm(form) {
+        // Clear previous error messages
+        clearErrors();
+        
+        // Get form data
+        const formData = new FormData(form);
+        const actionUrl = form.getAttribute('data-action');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Submit form
+        fetch(actionUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Close modal
+                closeModal('service-modal');
+                
+                // Show success message
+                showToast('success', data.message);
+                
+                // Reload page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                // Show error messages
+                if (data.errors) {
+                    displayErrors(data.errors);
+                } else {
+                    // Show general error message
+                    const formError = document.getElementById('form-error');
+                    const formErrorMessage = document.getElementById('form-error-message');
+                    formErrorMessage.textContent = data.message || 'Terjadi kesalahan. Silakan coba lagi.';
+                    formError.classList.remove('hidden');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+            
+            // Show error message
+            const formError = document.getElementById('form-error');
+            const formErrorMessage = document.getElementById('form-error-message');
+            formErrorMessage.textContent = 'Terjadi kesalahan saat mengirim form. Silakan coba lagi.';
+            formError.classList.remove('hidden');
+        });
+    }
+    
+    // Display field-specific errors
+    function displayErrors(errors) {
+        for (const field in errors) {
+            const errorElement = document.getElementById(`${field}-error`);
+            if (errorElement) {
+                errorElement.textContent = errors[field].join(' ');
+                errorElement.classList.remove('hidden');
+            }
+        }
+        
+        // If there are non-field errors, display them in the form error section
+        if (errors.non_field_errors) {
+            const formError = document.getElementById('form-error');
+            const formErrorMessage = document.getElementById('form-error-message');
+            formErrorMessage.textContent = errors.non_field_errors.join(' ');
+            formError.classList.remove('hidden');
+        }
+    }
+    
+    // Clear all error messages
+    function clearErrors() {
+        // Hide form error
+        const formError = document.getElementById('form-error');
+        formError.classList.add('hidden');
+        
+        // Hide field errors
+        const errorElements = document.querySelectorAll('.error-message');
+        errorElements.forEach(element => {
+            element.textContent = '';
+            element.classList.add('hidden');
+        });
+    }
+</script>

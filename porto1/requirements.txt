@@ -1,0 +1,12 @@
+Django==5.2.4
+Pillow==10.0.0
+python-dotenv==1.0.0
+django-crispy-forms==2.0
+django-tailwind==3.6.0
+django-ckeditor==6.7.0
+django-colorfield==0.10.1
+django-taggit==4.0.0
+requests==2.31.0
+psycopg2-binary==2.9.9
+gunicorn==21.2.0
+whitenoise==6.5.0

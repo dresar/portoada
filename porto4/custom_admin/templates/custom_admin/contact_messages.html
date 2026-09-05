@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for ContactMessage model
+    window.templateFields = ['name', 'email', 'subject', 'message', 'phone', 'company', 'is_read', 'created_at'];
+</script>
+{% endblock %}

@@ -1,0 +1,512 @@
+{% extends 'custom_admin/base.html' %}
+{% load admin_extras %}
+
+{% block title %}{{ model_name_plural }} - Custom Admin{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h3 text-white mb-0">
+            <i class="bi bi-table me-2"></i>
+            {{ model_name_plural }}
+        </h1>
+        <p class="text-muted">Manage {{ model_name_plural|lower }}</p>
+    </div>
+</div>
+
+<!-- Action Bar -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+            <i class="bi bi-plus-circle me-2"></i>
+            Add {{ model_name }}
+        </button>
+        <button type="button" class="btn btn-danger" id="bulkDeleteBtn" style="display: none;">
+            <i class="bi bi-trash me-2"></i>
+            Delete Selected
+        </button>
+    </div>
+    <div class="col-md-6">
+        <form method="get" class="d-flex">
+            <input type="text" class="form-control me-2" name="search" placeholder="Search..." value="{{ search }}">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th width="50">
+                            <input type="checkbox" id="selectAll" class="form-check-input">
+                        </th>
+                        {% for field in fields %}
+                            <th>{{ field|title }}</th>
+                        {% endfor %}
+                        <th width="150">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obj in objects %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input row-checkbox" value="{{ obj.id }}">
+                            </td>
+                            {% for field in fields %}
+                                <td>
+                                    {% with obj|get_attr:field as value %}
+                                        {% if value|length > 50 %}
+                                            {{ value|truncatechars:50 }}
+                                        {% elif field == 'is_featured' or field == 'is_active' or field == 'is_current' or field == 'is_staff' or field == 'is_read' %}
+                                            {% if value %}
+                                                <span class="badge bg-success">Yes</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">No</span>
+                                            {% endif %}
+                                        {% elif field == 'status' %}
+                                            <span class="badge bg-{% if value == 'published' %}success{% elif value == 'draft' %}warning{% else %}secondary{% endif %}">
+                                                {{ value|title }}
+                                            </span>
+                                        {% elif field|slice:"-3:" == '_at' or field|slice:"-5:" == '_date' %}
+                                            {% if value %}
+                                                {{ value|date:"M d, Y" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        {% else %}
+                                            {{ value|default:"-" }}
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
+                            {% endfor %}
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-warning" onclick="editObject({{ obj.id }})">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="deleteObject({{ obj.id }})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="{{ fields|length|add:2 }}" class="text-center py-4">
+                                <i class="bi bi-inbox text-muted fs-1 mb-3 d-block"></i>
+                                <p class="text-muted">No {{ model_name_plural|lower }} found</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if objects.has_other_pages %}
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if objects.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ objects.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ objects.number }} of {{ objects.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if objects.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ objects.next_page_number }}{% if search %}&search={{ search }}{% endif %}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ objects.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}">Last &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Add {{ model_name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create">
+                    <div class="row" id="addFormFields">
+                        <!-- Fields will be dynamically generated -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil me-2"></i>
+                    Edit {{ model_name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="id" id="editId">
+                    <div class="row" id="editFormFields">
+                        <!-- Fields will be dynamically generated -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this {{ model_name|lower }}?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="bi bi-trash me-2"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const fields = window.templateFields || {{ fields|safe }};
+    const modelName = '{{ model_name|lower }}';
+    let deleteId = null;
+    
+    // Generate form fields
+    function generateFormFields(container, data = {}) {
+        container.innerHTML = '';
+        
+        fields.forEach(field => {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-md-6 mb-3';
+            
+            const label = document.createElement('label');
+            label.className = 'form-label';
+            label.textContent = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            let input;
+            
+            if (field.includes('description') || field.includes('content') || field.includes('message')) {
+                input = document.createElement('textarea');
+                input.className = 'form-control';
+                input.rows = 3;
+            } else if (field.includes('date') || field.includes('_at')) {
+                input = document.createElement('input');
+                input.type = 'date';
+                input.className = 'form-control';
+            } else if (field.includes('email')) {
+                input = document.createElement('input');
+                input.type = 'email';
+                input.className = 'form-control';
+            } else if (field.includes('url')) {
+                input = document.createElement('input');
+                input.type = 'url';
+                input.className = 'form-control';
+            } else if (field.includes('phone')) {
+                input = document.createElement('input');
+                input.type = 'tel';
+                input.className = 'form-control';
+            } else if (field.startsWith('is_') || field.includes('featured') || field.includes('active') || field.includes('current') || field.includes('staff') || field.includes('read')) {
+                input = document.createElement('select');
+                input.className = 'form-select';
+                input.innerHTML = '<option value="">Select...</option><option value="true">Yes</option><option value="false">No</option>';
+            } else if (field === 'status') {
+                input = document.createElement('select');
+                input.className = 'form-select';
+                input.innerHTML = '<option value="">Select...</option><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option>';
+            } else {
+                input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-control';
+            }
+            
+            input.name = field;
+            input.id = field;
+            
+            if (data[field] !== undefined) {
+                if (input.type === 'checkbox') {
+                    input.checked = data[field];
+                } else {
+                    input.value = data[field] || '';
+                }
+            }
+            
+            colDiv.appendChild(label);
+            colDiv.appendChild(input);
+            container.appendChild(colDiv);
+        });
+    }
+    
+    // Initialize add form
+    document.addEventListener('DOMContentLoaded', function() {
+        generateFormFields(document.getElementById('addFormFields'));
+    });
+    
+    // Handle add form submission
+    document.getElementById('addForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        showLoading();
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                showToast(data.message, 'success');
+                bootstrap.Modal.getInstance(document.getElementById('addModal')).hide();
+                location.reload();
+            } else {
+                showToast(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showToast('An error occurred', 'danger');
+        });
+    });
+    
+    // Handle edit form submission
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        showLoading();
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                showToast(data.message, 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                location.reload();
+            } else {
+                showToast(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showToast('An error occurred', 'danger');
+        });
+    });
+    
+    // Edit object function
+    function editObject(id) {
+        showLoading();
+        
+        fetch(`/custom-admin/api/get-object/${modelName}/${id}/`, {
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                document.getElementById('editId').value = id;
+                generateFormFields(document.getElementById('editFormFields'), data.data);
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            } else {
+                showToast(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showToast('An error occurred', 'danger');
+        });
+    }
+    
+    // Delete object function
+    function deleteObject(id) {
+        deleteId = id;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+    
+    // Confirm delete
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        if (!deleteId) return;
+        
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('id', deleteId);
+        formData.append('csrfmiddlewaretoken', csrftoken);
+        
+        showLoading();
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                showToast(data.message, 'success');
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                location.reload();
+            } else {
+                showToast(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showToast('An error occurred', 'danger');
+        });
+    });
+    
+    // Select all functionality
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        toggleBulkDelete();
+    });
+    
+    // Individual checkbox change
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('row-checkbox')) {
+            toggleBulkDelete();
+        }
+    });
+    
+    // Toggle bulk delete button
+    function toggleBulkDelete() {
+        const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        
+        if (checkedBoxes.length > 0) {
+            bulkDeleteBtn.style.display = 'inline-block';
+        } else {
+            bulkDeleteBtn.style.display = 'none';
+        }
+    }
+    
+    // Bulk delete functionality
+    document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+        const ids = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        if (ids.length === 0) return;
+        
+        if (confirm(`Are you sure you want to delete ${ids.length} items?`)) {
+            showLoading();
+            
+            fetch('/custom-admin/api/bulk-delete/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    model: modelName,
+                    ids: ids
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    location.reload();
+                } else {
+                    showToast(data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                showToast('An error occurred', 'danger');
+            });
+        }
+    });
+</script>
+{% endblock %}

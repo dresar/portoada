@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Posts - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+        
+        .blog-card {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">Blog Posts</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                            <i class="fas fa-home mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-500">Blog Posts</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Header with Actions -->
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+                <h2 class="text-2xl font-bold text-gray-800">Blog Posts</h2>
+                
+                <div class="flex space-x-3">
+                    <a href="{% url 'custom_admin:blog_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add New Post
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_category_list' %}" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                        <i class="fas fa-tags mr-2"></i> Categories
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Filters and Search -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                        <div>
+                            <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="status-filter" class="w-full sm:w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                <option value="all">All</option>
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select id="category-filter" class="w-full sm:w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                <option value="all">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% empty %}
+                                <option value="1">Civil Engineering</option>
+                                <option value="2">Project Management</option>
+                                <option value="3">Construction</option>
+                                <option value="4">Architecture</option>
+                                <option value="5">Sustainability</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="sort-by" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                            <select id="sort-by" class="w-full sm:w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="title_asc">Title (A-Z)</option>
+                                <option value="title_desc">Title (Z-A)</option>
+                                <option value="views">Most Views</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-64">
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                        <div class="relative">
+                            <input type="text" id="search" placeholder="Search posts..." class="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Blog Posts Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for post in posts %}
+                <div class="blog-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="relative">
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                {% if post.status == 'published' %}
+                                    bg-green-100 text-green-800
+                                {% else %}
+                                    bg-yellow-100 text-yellow-800
+                                {% endif %}
+                            ">
+                                {{ post.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 truncate">{{ post.title }}</h3>
+                            <div class="dropdown relative">
+                                <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <a href="{% url 'custom_admin:blog_edit' post.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <a href="{% url 'custom_admin:blog_detail' post.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-eye mr-2"></i> View Details
+                                    </a>
+                                    <a href="{% url 'main_app:blog_detail' post.slug %}" target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                    </a>
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-post" data-id="{{ post.id }}" data-title="{{ post.title }}">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                {{ post.created_at|date:"M d, Y" }}
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                {{ post.views|default:"0" }}
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-comment mr-1"></i>
+                                {{ post.comment_count|default:"0" }}
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ post.excerpt }}</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">{{ post.category.name }}</span>
+                            </div>
+                            
+                            <a href="{% url 'custom_admin:blog_detail' post.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <!-- Example Blog Posts (for demonstration) -->
+                <div class="blog-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example blog post 1" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Published</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 truncate">Modern Bridge Design Principles</h3>
+                            <div class="dropdown relative">
+                                <button class="text-gray-500 hover:text-gray-700 focus:outline-none dropdown-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-eye mr-2"></i> View Details
+                                    </a>
+                                    <a href="#" target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                    </a>
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-post" data-id="1" data-title="Modern Bridge Design Principles">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                Jun 15, 2023
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                245
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-comment mr-1"></i>
+                                12
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Exploring the latest innovations in bridge design and construction techniques that are revolutionizing civil engineering projects worldwide.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Civil Engineering</span>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="blog-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example blog post 2" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Draft</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 truncate">Sustainable Construction Methods</h3>
+                            <div class="dropdown relative">
+                                <button class="text-gray-500 hover:text-gray-700 focus:outline-none dropdown-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-eye mr-2"></i> View Details
+                                    </a>
+                                    <a href="#" target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                    </a>
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-post" data-id="2" data-title="Sustainable Construction Methods">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                Jul 22, 2023
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                0
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-comment mr-1"></i>
+                                0
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">How eco-friendly building practices are changing the construction industry and reducing environmental impact while maintaining structural integrity.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Sustainability</span>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="blog-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example blog post 3" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Published</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 truncate">Project Management Best Practices</h3>
+                            <div class="dropdown relative">
+                                <button class="text-gray-500 hover:text-gray-700 focus:outline-none dropdown-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-eye mr-2"></i> View Details
+                                    </a>
+                                    <a href="#" target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                    </a>
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-post" data-id="3" data-title="Project Management Best Practices">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                Aug 5, 2023
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                189
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-comment mr-1"></i>
+                                8
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Essential strategies for managing complex civil engineering projects, from initial planning to successful completion on time and within budget.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Project Management</span>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="blog-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1590274853856-f22d5ee3d228?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example blog post 4" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Published</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 truncate">Innovative Structural Analysis Techniques</h3>
+                            <div class="dropdown relative">
+                                <button class="text-gray-500 hover:text-gray-700 focus:outline-none dropdown-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-eye mr-2"></i> View Details
+                                    </a>
+                                    <a href="#" target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                    </a>
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-post" data-id="4" data-title="Innovative Structural Analysis Techniques">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                Sep 12, 2023
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                156
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-comment mr-1"></i>
+                                5
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Advanced computational methods and software tools that are transforming how engineers analyze and design complex structures.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Civil Engineering</span>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="blog-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example blog post 5" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Published</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 truncate">Urban Planning for Smart Cities</h3>
+                            <div class="dropdown relative">
+                                <button class="text-gray-500 hover:text-gray-700 focus:outline-none dropdown-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-eye mr-2"></i> View Details
+                                    </a>
+                                    <a href="#" target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                    </a>
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-post" data-id="5" data-title="Urban Planning for Smart Cities">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                Oct 3, 2023
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                210
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-comment mr-1"></i>
+                                15
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">How civil engineers are collaborating with urban planners to create intelligent, sustainable, and resilient cities for the future.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Architecture</span>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="blog-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Example blog post 6" class="w-full h-48 object-cover">
+                        <div class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Draft</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 truncate">Earthquake-Resistant Building Design</h3>
+                            <div class="dropdown relative">
+                                <button class="text-gray-500 hover:text-gray-700 focus:outline-none dropdown-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-eye mr-2"></i> View Details
+                                    </a>
+                                    <a href="#" target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-external-link-alt mr-2"></i> View Live
+                                    </a>
+                                    <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-post" data-id="6" data-title="Earthquake-Resistant Building Design">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                Nov 18, 2023
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-eye mr-1"></i>
+                                0
+                            </span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center">
+                                <i class="far fa-comment mr-1"></i>
+                                0
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Principles and techniques for designing structures that can withstand seismic activity, with case studies from recent projects around the world.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Construction</span>
+                            </div>
+                            
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            <div class="flex justify-center mt-8">
+                <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </a>
+                    
+                    <a href="#" aria-current="page" class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100">
+                        1
+                    </a>
+                    
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        2
+                    </a>
+                    
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        3
+                    </a>
+                    
+                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                        ...
+                    </span>
+                    
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        8
+                    </a>
+                    
+                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </a>
+                </nav>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+                <p class="text-gray-700 mb-6">Are you sure you want to delete the blog post "<span id="delete-post-title"></span>"? This action cannot be undone.</p>
+                
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-delete" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                        Cancel
+                    </button>
+                    
+                    <form id="delete-form" method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // Toggle dropdown menus
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dropdown = toggle.nextElementSibling;
+                dropdown.classList.toggle('hidden');
+                
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    if (menu !== dropdown && !menu.classList.contains('hidden')) {
+                        menu.classList.add('hidden');
+                    }
+                });
+            });
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        });
+        
+        // Delete confirmation modal
+        const deleteButtons = document.querySelectorAll('.delete-post');
+        const deleteModal = document.getElementById('delete-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const deleteForm = document.getElementById('delete-form');
+        const deletePostTitle = document.getElementById('delete-post-title');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const postId = button.dataset.id;
+                const postTitle = button.dataset.title;
+                
+                deletePostTitle.textContent = postTitle;
+                deleteForm.action = `/custom_admin/blog/${postId}/delete/`;
+                deleteModal.classList.remove('hidden');
+            });
+        });
+        
+        cancelDelete.addEventListener('click', () => {
+            deleteModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        deleteModal.addEventListener('click', (event) => {
+            if (event.target === deleteModal) {
+                deleteModal.classList.add('hidden');
+            }
+        });
+        
+        // Filter functionality
+        const statusFilter = document.getElementById('status-filter');
+        const categoryFilter = document.getElementById('category-filter');
+        const sortBy = document.getElementById('sort-by');
+        const searchInput = document.getElementById('search');
+        
+        // In a real application, these would trigger AJAX requests or form submissions
+        // For demonstration, we'll just log the filter changes
+        
+        statusFilter.addEventListener('change', () => {
+            console.log('Status filter changed to:', statusFilter.value);
+        });
+        
+        categoryFilter.addEventListener('change', () => {
+            console.log('Category filter changed to:', categoryFilter.value);
+        });
+        
+        sortBy.addEventListener('change', () => {
+            console.log('Sort by changed to:', sortBy.value);
+        });
+        
+        // Search with debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                console.log('Searching for:', searchInput.value);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

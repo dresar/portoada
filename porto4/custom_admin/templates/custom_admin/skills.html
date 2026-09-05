@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Skill model
+    window.templateFields = ['name', 'category', 'proficiency_level', 'years_of_experience', 'is_featured', 'display_order'];
+</script>
+{% endblock %}

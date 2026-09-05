@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Details - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .main-content-expanded {
+            margin-left: 5rem;
+        }
+        
+        /* Content styling */
+        .blog-content h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .blog-content h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .blog-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: #1f2937;
+        }
+        
+        .blog-content h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: #1f2937;
+        }
+        
+        .blog-content p {
+            margin-bottom: 1rem;
+            line-height: 1.625;
+        }
+        
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .blog-content ul {
+            list-style-type: disc;
+        }
+        
+        .blog-content ol {
+            list-style-type: decimal;
+        }
+        
+        .blog-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .blog-content a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        
+        .blog-content blockquote {
+            border-left: 4px solid #e5e7eb;
+            padding-left: 1rem;
+            font-style: italic;
+            margin: 1.5rem 0;
+            color: #4b5563;
+        }
+        
+        .blog-content pre {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        
+        .blog-content code {
+            font-family: monospace;
+            background-color: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .blog-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.375rem;
+            margin: 1.5rem 0;
+        }
+        
+        .blog-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .blog-content th, .blog-content td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .blog-content th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center">
+            <button id="sidebar-toggle" class="text-gray-500 hover:text-blue-600 focus:outline-none mr-4">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">Blog Post Details</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-blue-600 focus:outline-none relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center focus:outline-none">
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile">
+                    <span class="ml-2 text-gray-700 font-medium hidden md:block">Admin</span>
+                    <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                </button>
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i> Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar bg-gray-800 text-white w-64 min-h-screen overflow-y-auto">
+            <div class="py-4">
+                <div class="px-6 py-2">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/50" alt="Logo" class="h-10 w-10 rounded-full">
+                        <div class="ml-3 sidebar-text">
+                            <h2 class="text-lg font-semibold">Civil Engineer</h2>
+                            <p class="text-xs text-gray-400">Portfolio Admin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="mt-8">
+                    <div class="px-4 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:dashboard' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:personal_info_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-user mr-3"></i>
+                        <span class="sidebar-text">Personal Info</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:project_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        <span class="sidebar-text">Projects</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:education_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-graduation-cap mr-3"></i>
+                        <span class="sidebar-text">Education</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:experience_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-briefcase mr-3"></i>
+                        <span class="sidebar-text">Experience</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:skill_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-tools mr-3"></i>
+                        <span class="sidebar-text">Skills</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:certificate_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-certificate mr-3"></i>
+                        <span class="sidebar-text">Certificates</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:service_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-concierge-bell mr-3"></i>
+                        <span class="sidebar-text">Services</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:testimonial_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span class="sidebar-text">Testimonials</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:blog_list' %}" class="flex items-center px-6 py-3 text-gray-100 bg-blue-600">
+                        <i class="fas fa-blog mr-3"></i>
+                        <span class="sidebar-text">Blog Posts</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:contact_message_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span class="sidebar-text">Contact Messages</span>
+                    </a>
+                    
+                    <div class="px-4 mt-6 mb-3">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                    </div>
+                    
+                    <a href="{% url 'custom_admin:social_media_list' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-share-alt mr-3"></i>
+                        <span class="sidebar-text">Social Media</span>
+                    </a>
+                    
+                    <a href="{% url 'custom_admin:settings' %}" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="main-content flex-1 overflow-y-auto p-6">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'custom_admin:dashboard' %}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                            <i class="fas fa-home mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <a href="{% url 'custom_admin:blog_list' %}" class="text-gray-700 hover:text-blue-600">
+                                Blog Posts
+                            </a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <span class="text-gray-500">{{ post.title|truncatechars:30 }}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3 mb-6">
+                <a href="{% url 'custom_admin:blog_edit' post.id %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                    <i class="fas fa-edit mr-2"></i> Edit
+                </a>
+                
+                <button id="delete-button" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                    <i class="fas fa-trash-alt mr-2"></i> Delete
+                </button>
+                
+                {% if post.status == 'published' %}
+                <a href="{% url 'main_app:blog_detail' post.slug %}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center">
+                    <i class="fas fa-external-link-alt mr-2"></i> View Live
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Content Column -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Blog Post Card -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <!-- Featured Image -->
+                        <div class="relative">
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-64 object-cover">
+                            <div class="absolute top-0 right-0 mt-4 mr-4">
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full
+                                    {% if post.status == 'published' %}
+                                        bg-green-100 text-green-800
+                                    {% else %}
+                                        bg-yellow-100 text-yellow-800
+                                    {% endif %}
+                                ">
+                                    {{ post.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Post Header -->
+                        <div class="p-6">
+                            <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+                            
+                            <div class="flex flex-wrap items-center text-sm text-gray-500 mb-6">
+                                <span class="flex items-center mr-4 mb-2">
+                                    <i class="far fa-calendar-alt mr-1"></i>
+                                    Created: {{ post.created_at|date:"M d, Y" }}
+                                </span>
+                                
+                                {% if post.published_at %}
+                                <span class="flex items-center mr-4 mb-2">
+                                    <i class="fas fa-calendar-check mr-1"></i>
+                                    Published: {{ post.published_at|date:"M d, Y" }}
+                                </span>
+                                {% endif %}
+                                
+                                <span class="flex items-center mr-4 mb-2">
+                                    <i class="far fa-clock mr-1"></i>
+                                    Last Updated: {{ post.updated_at|date:"M d, Y" }}
+                                </span>
+                                
+                                <span class="flex items-center mr-4 mb-2">
+                                    <i class="far fa-eye mr-1"></i>
+                                    {{ post.views|default:"0" }} Views
+                                </span>
+                                
+                                <span class="flex items-center mr-4 mb-2">
+                                    <i class="far fa-comment mr-1"></i>
+                                    {{ post.comment_count|default:"0" }} Comments
+                                </span>
+                                
+                                {% if post.is_featured %}
+                                <span class="flex items-center mb-2 text-blue-600">
+                                    <i class="fas fa-star mr-1"></i>
+                                    Featured
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h2 class="text-lg font-semibold text-gray-800 mb-2">Excerpt</h2>
+                                <p class="text-gray-600 italic">{{ post.excerpt }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Blog Content Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Content</h2>
+                        <div class="blog-content prose max-w-none">
+                            {{ post.content|safe }}
+                        </div>
+                    </div>
+                    
+                    <!-- Comments Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Comments ({{ post.comment_count|default:"0" }})</h2>
+                            
+                            <div class="flex items-center">
+                                <span class="mr-2 text-sm text-gray-600">Comments are {{ post.allow_comments|yesno:"enabled,disabled" }}</span>
+                                <label for="toggle-comments" class="inline-flex relative items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-comments" class="sr-only peer" {% if post.allow_comments %}checked{% endif %}>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {% if post.comments.exists %}
+                        <div class="space-y-4">
+                            {% for comment in post.comments.all %}
+                            <div class="border-b border-gray-200 pb-4 {% if not forloop.last %}mb-4{% endif %}">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center">
+                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold text-lg">
+                                            {{ comment.author_name|slice:"0:1" }}
+                                        </div>
+                                        <div class="ml-3">
+                                            <h4 class="text-sm font-medium text-gray-900">{{ comment.author_name }}</h4>
+                                            <p class="text-xs text-gray-500">{{ comment.created_at|date:"M d, Y \a\t H:i" }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="dropdown relative">
+                                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none dropdown-toggle">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                            <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 approve-comment" data-id="{{ comment.id }}" {% if comment.is_approved %}disabled{% endif %}>
+                                                <i class="fas fa-check mr-2"></i> {% if comment.is_approved %}Approved{% else %}Approve{% endif %}
+                                            </button>
+                                            <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 delete-comment" data-id="{{ comment.id }}">
+                                                <i class="fas fa-trash-alt mr-2"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="ml-13 pl-13">
+                                    <p class="text-gray-600 text-sm">{{ comment.content }}</p>
+                                </div>
+                                
+                                {% if not comment.is_approved %}
+                                <div class="mt-2 ml-13 pl-13">
+                                    <span class="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">Pending Approval</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="far fa-comment-dots text-gray-300 text-5xl mb-3"></i>
+                            <p class="text-gray-500">No comments yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Sidebar Column -->
+                <div class="space-y-6">
+                    <!-- Meta Information Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Meta Information</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">Category</h3>
+                                <div class="flex items-center">
+                                    <span class="text-sm font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">{{ post.category.name }}</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">Tags</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    {% for tag in post.tags.all %}
+                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full">{{ tag.name }}</span>
+                                    {% empty %}
+                                    <span class="text-xs text-gray-500">No tags</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">Slug</h3>
+                                <p class="text-sm text-gray-600 break-all">{{ post.slug }}</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">Author</h3>
+                                <p class="text-sm text-gray-600">{{ post.author.get_full_name|default:post.author.username }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SEO Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">SEO</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">Meta Title</h3>
+                                <p class="text-sm text-gray-600">{{ post.meta_title|default:post.title }}</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-1">Meta Description</h3>
+                                <p class="text-sm text-gray-600">{{ post.meta_description|default:post.excerpt|truncatechars:160 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Statistics Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Statistics</h2>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                                        <i class="far fa-eye"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Views</p>
+                                        <p class="text-xl font-semibold text-gray-800">{{ post.views|default:"0" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                                        <i class="far fa-comment"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Comments</p>
+                                        <p class="text-xl font-semibold text-gray-800">{{ post.comment_count|default:"0" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 rounded-full bg-purple-100 text-purple-500 mr-4">
+                                        <i class="fas fa-share-alt"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Shares</p>
+                                        <p class="text-xl font-semibold text-gray-800">{{ post.share_count|default:"0" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-500 mr-4">
+                                        <i class="far fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Avg. Time</p>
+                                        <p class="text-xl font-semibold text-gray-800">{{ post.avg_time_on_page|default:"0:00" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Related Posts Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Related Posts</h2>
+                        
+                        {% if related_posts %}
+                        <div class="space-y-4">
+                            {% for related_post in related_posts %}
+                            <div class="flex items-start space-x-3">
+                                <img src="{{ related_post.image.url }}" alt="{{ related_post.title }}" class="w-16 h-16 object-cover rounded-md">
+                                <div>
+                                    <a href="{% url 'custom_admin:blog_detail' related_post.id %}" class="text-sm font-medium text-gray-900 hover:text-blue-600">{{ related_post.title }}</a>
+                                    <p class="text-xs text-gray-500 mt-1">{{ related_post.created_at|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-gray-500 text-sm">No related posts found</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+                <p class="text-gray-700 mb-6">Are you sure you want to delete the blog post "{{ post.title }}"? This action cannot be undone.</p>
+                
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-delete" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                        Cancel
+                    </button>
+                    
+                    <form method="post" action="{% url 'custom_admin:blog_delete' post.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Comment Delete Confirmation Modal -->
+    <div id="delete-comment-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Confirm Comment Deletion</h3>
+                <p class="text-gray-700 mb-6">Are you sure you want to delete this comment? This action cannot be undone.</p>
+                
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-delete-comment" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-300">
+                        Cancel
+                    </button>
+                    
+                    <form id="delete-comment-form" method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle user menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+        
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            
+            sidebarTexts.forEach(text => {
+                text.classList.toggle('hidden');
+            });
+        });
+        
+        // Toggle dropdown menus
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dropdown = toggle.nextElementSibling;
+                dropdown.classList.toggle('hidden');
+                
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    if (menu !== dropdown && !menu.classList.contains('hidden')) {
+                        menu.classList.add('hidden');
+                    }
+                });
+            });
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        });
+        
+        // Delete post modal
+        const deleteButton = document.getElementById('delete-button');
+        const deleteModal = document.getElementById('delete-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        
+        deleteButton.addEventListener('click', () => {
+            deleteModal.classList.remove('hidden');
+        });
+        
+        cancelDelete.addEventListener('click', () => {
+            deleteModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        deleteModal.addEventListener('click', (event) => {
+            if (event.target === deleteModal) {
+                deleteModal.classList.add('hidden');
+            }
+        });
+        
+        // Toggle comments
+        const toggleComments = document.getElementById('toggle-comments');
+        
+        toggleComments.addEventListener('change', () => {
+            // In a real application, this would send an AJAX request to update the allow_comments field
+            console.log('Comments toggled:', toggleComments.checked);
+            
+            // Example AJAX request (commented out)
+            /*
+            fetch('/custom_admin/blog/{{ post.id }}/toggle-comments/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    allow_comments: toggleComments.checked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert toggle if there was an error
+                toggleComments.checked = !toggleComments.checked;
+            });
+            */
+        });
+        
+        // Comment actions
+        const approveCommentButtons = document.querySelectorAll('.approve-comment');
+        const deleteCommentButtons = document.querySelectorAll('.delete-comment');
+        const deleteCommentModal = document.getElementById('delete-comment-modal');
+        const cancelDeleteComment = document.getElementById('cancel-delete-comment');
+        const deleteCommentForm = document.getElementById('delete-comment-form');
+        
+        approveCommentButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const commentId = button.dataset.id;
+                
+                // In a real application, this would send an AJAX request to approve the comment
+                console.log('Approving comment:', commentId);
+                
+                // Example AJAX request (commented out)
+                /*
+                fetch(`/custom_admin/blog/comment/${commentId}/approve/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    // Update UI to show comment is approved
+                    button.textContent = 'Approved';
+                    button.disabled = true;
+                    // Remove pending approval badge
+                    const pendingBadge = button.closest('.border-b').querySelector('.text-yellow-600');
+                    if (pendingBadge) pendingBadge.parentElement.remove();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+                */
+            });
+        });
+        
+        deleteCommentButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const commentId = button.dataset.id;
+                
+                // Set the form action
+                deleteCommentForm.action = `/custom_admin/blog/comment/${commentId}/delete/`;
+                
+                // Show the modal
+                deleteCommentModal.classList.remove('hidden');
+            });
+        });
+        
+        cancelDeleteComment.addEventListener('click', () => {
+            deleteCommentModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        deleteCommentModal.addEventListener('click', (event) => {
+            if (event.target === deleteCommentModal) {
+                deleteCommentModal.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}Kelola Proyek{% endblock %}
+{% block page_title %}Kelola Proyek{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Kelola Proyek</h1>
+            {% if projects.count %}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                {{ projects.count }} proyek
+            </span>
+            {% endif %}
+        </div>
+        
+        <div class="mt-4 sm:mt-0 flex space-x-3">
+            <a href="{% url 'admin:core_project_add' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                <i class="fas fa-plus mr-2"></i>
+                Tambah Proyek
+            </a>
+            
+            <button onclick="exportProjects()" 
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-download mr-2"></i>
+                Export
+            </button>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cari</label>
+                <input type="text" name="search" id="search" value="{{ request.GET.search }}" 
+                       placeholder="Nama proyek atau deskripsi..."
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+            </div>
+            
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                    <option value="">Semua Status</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Aktif</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Tidak Aktif</option>
+                    <option value="featured" {% if request.GET.status == 'featured' %}selected{% endif %}>Unggulan</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Urutkan</label>
+                <select name="order" id="order" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                    <option value="-created_at" {% if request.GET.order == '-created_at' %}selected{% endif %}>Terbaru</option>
+                    <option value="created_at" {% if request.GET.order == 'created_at' %}selected{% endif %}>Terlama</option>
+                    <option value="title" {% if request.GET.order == 'title' %}selected{% endif %}>Nama A-Z</option>
+                    <option value="-title" {% if request.GET.order == '-title' %}selected{% endif %}>Nama Z-A</option>
+                    <option value="order" {% if request.GET.order == 'order' %}selected{% endif %}>Urutan</option>
+                </select>
+            </div>
+            
+            <div class="flex items-end">
+                <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500">
+                    <i class="fas fa-search mr-2"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Projects Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for project in projects %}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
+            <!-- Project Image -->
+            <div class="relative h-48 bg-gray-200 dark:bg-gray-700">
+                {% if project.image %}
+                <img src="{{ project.image.url }}" alt="{{ project.title }}" 
+                     class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center">
+                    <i class="fas fa-image text-4xl text-gray-400 dark:text-gray-600"></i>
+                </div>
+                {% endif %}
+                
+                <!-- Status Badges -->
+                <div class="absolute top-3 left-3 flex space-x-2">
+                    {% if project.is_featured %}
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                        <i class="fas fa-star mr-1"></i>Unggulan
+                    </span>
+                    {% endif %}
+                    
+                    {% if project.is_active %}
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                        Aktif
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                        Tidak Aktif
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Progress Badge -->
+                {% if project.projectprogress_set.first %}
+                <div class="absolute top-3 right-3">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                        {{ project.projectprogress_set.first.progress }}%
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Project Content -->
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
+                        {{ project.title }}
+                    </h3>
+                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                        #{{ project.order }}
+                    </span>
+                </div>
+                
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                    {{ project.description|truncatechars:100 }}
+                </p>
+                
+                <!-- Technologies -->
+                {% if project.technologies %}
+                <div class="mb-4">
+                    <div class="flex flex-wrap gap-1">
+                        {% for tech in project.technologies|slice:":3" %}
+                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                            {{ tech }}
+                        </span>
+                        {% endfor %}
+                        {% if project.technologies|length > 3 %}
+                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                            +{{ project.technologies|length|add:"-3" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Project Links -->
+                <div class="flex items-center space-x-3 mb-4 text-sm">
+                    {% if project.live_url %}
+                    <a href="{{ project.live_url }}" target="_blank" 
+                       class="flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                        <i class="fas fa-external-link-alt mr-1"></i>
+                        Live
+                    </a>
+                    {% endif %}
+                    
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}" target="_blank" 
+                       class="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                        <i class="fab fa-github mr-1"></i>
+                        GitHub
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Project Stats -->
+                <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    <span>
+                        <i class="fas fa-calendar mr-1"></i>
+                        {{ project.created_at|date:"M Y" }}
+                    </span>
+                    <span>
+                        <i class="fas fa-tasks mr-1"></i>
+                        {{ project.task_set.count }} tugas
+                    </span>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex space-x-2">
+                    <a href="{% url 'admin_custom:project_detail' project.id %}" 
+                       class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-eye mr-1"></i>
+                        Lihat
+                    </a>
+                    
+                    <a href="{% url 'admin:core_project_change' project.id %}" 
+                       class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        <i class="fas fa-edit mr-1"></i>
+                        Edit
+                    </a>
+                    
+                    <button onclick="toggleProjectStatus({{ project.id }}, {{ project.is_active|yesno:'false,true' }})" 
+                            class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white {% if project.is_active %}bg-red-600 hover:bg-red-700{% else %}bg-green-600 hover:bg-green-700{% endif %}">
+                        {% if project.is_active %}
+                        <i class="fas fa-eye-slash mr-1"></i>
+                        {% else %}
+                        <i class="fas fa-eye mr-1"></i>
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Empty State -->
+        <div class="col-span-full">
+            <div class="text-center py-12">
+                <i class="fas fa-project-diagram text-6xl text-gray-400 dark:text-gray-600 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Belum ada proyek</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Mulai dengan menambahkan proyek pertama Anda.</p>
+                <a href="{% url 'admin:core_project_add' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>
+                    Tambah Proyek
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="bg-white dark:bg-gray-800 px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg sm:px-6">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Sebelumnya
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Selanjutnya
+                </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        Menampilkan
+                        <span class="font-medium">{{ page_obj.start_index }}</span>
+                        sampai
+                        <span class="font-medium">{{ page_obj.end_index }}</span>
+                        dari
+                        <span class="font-medium">{{ paginator.count }}</span>
+                        hasil
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                                {{ num }}
+                            </span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                {{ num }}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}" 
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleProjectStatus(projectId, newStatus) {
+    const action = newStatus ? 'mengaktifkan' : 'menonaktifkan';
+    
+    if (confirm(`Apakah Anda yakin ingin ${action} proyek ini?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin-custom/projects/${projectId}/toggle-status/`;
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        const statusInput = document.createElement('input');
+        statusInput.type = 'hidden';
+        statusInput.name = 'is_active';
+        statusInput.value = newStatus;
+        form.appendChild(statusInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function exportProjects() {
+    const params = new URLSearchParams(window.location.search);
+    params.set('export', 'csv');
+    window.location.href = '?' + params.toString();
+}
+
+// Auto-refresh project progress
+setInterval(function() {
+    const progressBadges = document.querySelectorAll('[data-project-id]');
+    progressBadges.forEach(function(badge) {
+        const projectId = badge.dataset.projectId;
+        // You can implement AJAX call to update progress here
+    });
+}, 60000); // Refresh every minute
+</script>
+{% endblock %}

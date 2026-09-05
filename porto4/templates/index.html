@@ -1,0 +1,1384 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if site_settings %}{{ site_settings.site_title }}{% else %}Portofolio Eka Syarif Maulana{% endif %}</title>
+    {% if site_settings and site_settings.meta_description %}
+    <meta name="description" content="{{ site_settings.meta_description }}">
+    {% endif %}
+    {% if site_settings and site_settings.meta_keywords %}
+    <meta name="keywords" content="{{ site_settings.meta_keywords }}">
+    {% endif %}
+    {% if site_settings and site_settings.favicon %}
+    <link rel="shortcut icon" href="{{ site_settings.favicon.url }}" type="image/x-icon">
+    {% endif %}
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Anime.js untuk animasi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Three.js untuk animasi 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- CSS Kustom -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- Animasi CSS tambahan -->
+    <style>
+        /* CSS tambahan yang spesifik untuk halaman ini (jika diperlukan) */
+
+
+
+    </style>
+</head>
+<body class="gradient-bg">
+
+    <!-- Theme Transition Animation -->
+    <div class="theme-transition" id="theme-transition"></div>
+    
+    <!-- Three.js Background Container -->
+    <div id="three-background" class="fixed top-0 left-0 w-full h-full overflow-hidden z-0"></div>
+    
+    <!-- Mouse Interaction Element for Three.js -->
+    <div id="mouse-interaction" class="fixed top-0 left-0 w-full h-full z-0 cursor-none"></div>
+    
+    <!-- Fitur 14: Latar belakang partikel (Fallback) -->
+    <div class="particles-container"></div>
+
+    <!-- Header & Navigasi -->
+    <!-- Fitur 15: Header responsif dengan efek blur -->
+    <header class="header-animated fixed top-0 left-0 w-full z-50 bg-black bg-opacity-30 backdrop-blur-lg border-b border-gray-700 transition-all duration-300">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Fitur 16: Nama dengan logo -->
+            <a href="#" class="logo-animated text-2xl font-bold text-white tracking-widest transition-all duration-300 hover:scale-105">
+                {% if site_settings and site_settings.logo %}
+                <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-8 mr-2 inline-block">
+                {% endif %}
+                {% if site_settings %}
+                {{ site_settings.site_title }}
+                {% else %}
+                <span class="text-primary-color">Ex</span>pedient<span class="text-primary-color">609</span>
+                {% endif %}
+            </a>
+            <!-- Fitur 17: Menu Desktop -->
+            <ul class="hidden md:flex space-x-6 text-white">
+                <li><a href="#home" class="nav-link-enhanced">Home</a></li>
+                <li><a href="#about" class="nav-link-enhanced">About Me</a></li>
+                <li><a href="#education" class="nav-link-enhanced">Education</a></li>
+                <li><a href="#skills" class="nav-link-enhanced">Skills</a></li>
+                <li><a href="#projects" class="nav-link-enhanced">Projects</a></li>
+                <li><a href="#experience" class="nav-link-enhanced">Experience</a></li>
+                <li><a href="#certificates" class="nav-link-enhanced">Certificates</a></li>
+                <li><a href="#blog" class="nav-link-enhanced">Blog</a></li>
+                <li><a href="#contact" class="nav-link-enhanced">Contact</a></li>
+            </ul>
+            <!-- Fitur 18: Tombol Dark/Light Mode dengan Animasi -->
+            <div class="flex items-center space-x-3">
+                <div class="theme-toggle-container hidden md:block">
+                    <button id="theme-toggle" class="theme-toggle-btn">
+                        <div class="theme-toggle-track">
+                            <div class="theme-toggle-thumb">
+                                <i class="theme-icon fas fa-moon"></i>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <!-- Fitur 19: Tombol Hamburger Mobile -->
+                <button id="mobile-menu-toggle" class="hamburger-btn md:hidden">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Fitur 20: Menu Mobile -->
+    <div id="mobile-menu" class="mobile-menu-enhanced md:hidden">
+        <div class="mobile-menu-content">
+            <div class="mobile-menu-header">
+                <h3 class="text-lg font-bold text-white">Menu</h3>
+                <button id="mobile-menu-close" class="mobile-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="mobile-nav-list">
+                <li><a href="#home" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#about" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-user"></i> About Me</a></li>
+                <li><a href="#education" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-graduation-cap"></i> Education</a></li>
+                <li><a href="#skills" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-code"></i> Skills</a></li>
+                <li><a href="#projects" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-folder"></i> Projects</a></li>
+                <li><a href="#experience" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-briefcase"></i> Experience</a></li>
+                <li><a href="#certificates" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-certificate"></i> Certificates</a></li>
+                <li><a href="#blog" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-blog"></i> Blog</a></li>
+                <li><a href="#contact" class="mobile-nav-link-enhanced" onclick="closeMobileMenu()"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+            <div class="mobile-theme-toggle-container">
+                <button id="mobile-theme-toggle" class="mobile-theme-toggle-btn">
+                    <div class="mobile-theme-toggle-track">
+                        <div class="mobile-theme-toggle-thumb">
+                            <i class="mobile-theme-icon fas fa-moon"></i>
+                        </div>
+                    </div>
+                    <span class="mobile-theme-text">Dark Mode</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main class="pt-24">
+        <!-- Bagian Home -->
+        <section id="home" class="min-h-screen flex items-center justify-center p-8 relative animate-on-scroll">
+            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="w-full md:w-1/2 text-center md:text-left">
+                    <h1 class="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight">
+                        Halo, Saya
+                        <br>
+                        <!-- Fitur 21: Animasi teks nama -->
+                        <span class="text-primary-color text-shadow typing-effect">
+                            {% if site_settings %}
+                            {{ site_settings.site_title }}
+                            {% else %}
+                            Eka Syarif Maulana
+                            {% endif %}
+                        </span>
+                        <br>
+                        <!-- Fitur 22: Teks dengan animasi fade-in -->
+                        <span class="text-3xl sm:text-4xl lg:text-5xl font-bold animate-in-home-delay-1">FULL STACK</span>
+                    </h1>
+                    <!-- Fitur 23: Teks dengan animasi fade-in -->
+                    <p class="text-xl mt-4 text-gray-300 animate-in-home-delay-2">
+                        Saya seorang <span class="text-blue-400 font-bold">Web Dev</span>
+                    </p>
+                    <!-- Fitur 24: Deskripsi dengan animasi fade-in dan typing -->
+                    <p class="mt-6 text-lg text-gray-400 max-w-xl mx-auto md:mx-0 animate-in-home-delay-3" id="home-description">
+                        
+                    </p>
+                    <!-- Fitur 25: Tombol dengan animasi -->
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4 animate-in-home-delay-4">
+                        <a href="#projects" class="btn-primary text-center">Lihat Karya</a>
+                        <a href="#" class="btn-secondary text-center">Unduh Resume</a>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 flex justify-center relative mt-12 md:mt-0">
+                    <!-- Floating shapes animation -->
+                    <div class="floating-shapes">
+                        <div class="floating-shape"></div>
+                        <div class="floating-shape"></div>
+                        <div class="floating-shape"></div>
+                        <div class="floating-shape"></div>
+                    </div>
+                    <!-- Fitur 26: Gambar profil dengan animasi hover -->
+                    <div class="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden shadow-2xl transition-transform duration-500 hover:scale-105">
+                        {% if user_profile and user_profile.photo %}
+                        <img src="{{ user_profile.photo.url }}" alt="Foto Profil" class="w-full h-full object-cover rounded-full">
+                        {% else %}
+                        <img src="{% static 'img/profile-placeholder.svg' %}" alt="Foto Profil" class="w-full h-full object-cover rounded-full" onerror="this.src='https://placehold.co/400x400/121223/fff?text=Foto+Profil'">
+                        {% endif %}
+                        <div class="absolute inset-0 bg-blue-500 opacity-20 rounded-full"></div>
+                    </div>
+                    <!-- Fitur 27: Kotak info dengan animasi fade-in -->
+                    <div class="absolute top-0 right-0 transform -translate-y-1/2 bg-green-500 bg-opacity-70 text-white font-bold p-4 rounded-xl shadow-lg border-2 border-green-400 animate-in-home-delay-5">
+                        <span class="text-2xl">21+</span><br>
+                        <span class="text-sm">Project Selesai</span>
+                    </div>
+                    <!-- Fitur 28: Kotak info dengan animasi fade-in -->
+                    <div class="absolute bottom-0 left-0 transform translate-y-1/2 bg-primary-color bg-opacity-70 text-white font-bold p-4 rounded-xl shadow-lg border-2 border-primary-color animate-in-home-delay-6">
+                        <span class="text-2xl">1+</span><br>
+                        <span class="text-sm">Tahun Pengalaman</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bagian About Me -->
+        <section id="about" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Tentang <span class="text-primary-color">Saya</span></h2>
+                <div class="flex flex-col md:flex-row items-center gap-12 bg-[#1f1f33] p-8 rounded-3xl shadow-xl card-hover">
+                    <div class="md:w-1/3 flex justify-center">
+                        {% if user_profile and user_profile.photo %}
+                        <img src="{{ user_profile.photo.url }}" alt="About Me" class="rounded-xl w-64 h-64 object-cover shadow-lg border-4 border-primary-color">
+                        {% else %}
+                        <img src="{% static 'img/profile-placeholder.svg' %}" alt="About Me" class="rounded-xl w-64 h-64 object-cover shadow-lg border-4 border-primary-color" onerror="this.src='https://placehold.co/300x300/1f1f33/fff?text=About+Me'">
+                        {% endif %}
+                    </div>
+                    <div class="md:w-2/3 text-lg text-gray-300 space-y-4">
+                        {% if user_profile and user_profile.bio %}
+                        {{ user_profile.bio|linebreaks }}
+                        
+                        <!-- Mobile expand/collapse button -->
+                        <div class="md:hidden">
+                            <button id="about-toggle" class="bg-primary-color text-white px-4 py-2 rounded-lg mt-4 flex items-center gap-2">
+                                <span>Selengkapnya</span>
+                                <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Content that can be collapsed on mobile -->
+                        <div id="about-content" class="about-expandable md:block">
+                        
+                        <!-- Services from database -->
+                        {% if services %}
+                        <h3 class="text-xl font-bold text-primary-color mt-6 mb-3">Layanan</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {% for service in services %}
+                            <div class="bg-gray-800 p-4 rounded-xl flex items-center gap-3 transform transition-transform hover:scale-105">
+                                {% if service.icon %}
+                                <i class="{{ service.icon }} text-2xl text-blue-400"></i>
+                                {% else %}
+                                <i class="fas fa-cog text-2xl text-blue-400"></i>
+                                {% endif %}
+                                <div>
+                                    <h4 class="font-semibold">{{ service.title }}</h4>
+                                    <p class="text-sm text-gray-400">{{ service.short_description }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Statistics from database -->
+                        {% if statistics %}
+                        <div class="flex flex-wrap gap-4 mt-6">
+                            {% for stat in statistics %}
+                            <div class="bg-gray-800 p-3 rounded-lg flex items-center gap-2 border border-blue-800">
+                                {% if stat.icon %}
+                                <i class="{{ stat.icon }} text-blue-400"></i>
+                                {% else %}
+                                <i class="fas fa-chart-line text-blue-400"></i>
+                                {% endif %}
+                                <span>{{ stat.label }}: {{ stat.value }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-6">
+                            <a href="#contact" class="btn-primary inline-flex items-center gap-2">
+                                <i class="fas fa-paper-plane"></i> Hubungi Saya
+                            </a>
+                        </div>
+                        </div> <!-- Close about-content -->
+                        {% else %}
+                        <p class="text-base text-gray-400">
+                            Informasi profil belum tersedia.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Bagian Pendidikan -->
+        <section id="education" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Riwayat <span class="text-primary-color">Pendidikan</span></h2>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+                    {% if education %}
+                        {% for edu in education %}
+                        <!-- Kartu pendidikan dengan animasi hover -->
+                        <div class="w-full md:w-1/2 lg:w-1/3 bg-[#1f1f33] p-6 rounded-3xl shadow-xl transition-transform duration-300 hover:scale-105 card-hover">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <i class="fas fa-university text-3xl text-primary-color"></i>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-white">{{ edu.institution }}</h3>
+                                    <p class="text-gray-400">{{ edu.degree }} in {{ edu.field_of_study }}</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-300">
+                                {{ edu.description }}
+                            </p>
+                            <p class="text-sm text-gray-500 mt-2">
+                                {{ edu.start_date|date:"Y" }} - {% if edu.is_current %}Sekarang{% else %}{{ edu.end_date|date:"Y" }}{% endif %}
+                                {% if edu.location %}<br>{{ edu.location }}{% endif %}
+                                {% if edu.gpa %}<br>GPA: {{ edu.gpa }}{% endif %}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="text-center text-gray-400">
+                        <p>Data pendidikan belum tersedia.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Bagian Keahlian -->
+        <section id="skills" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Keahlian <span class="text-primary-color">Saya</span></h2>
+                {% if skill_categories %}
+                    {% for category in skill_categories %}
+                    <div class="mb-12">
+                        <h3 class="text-2xl font-bold text-white mb-8 text-center">{{ category.name }}</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {% for skill in category.skill_set.all %}
+                            <div class="bg-[#1f1f33] p-6 rounded-2xl shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl card-hover skill-item group">
+                                <div class="flex items-center mb-4">
+                                    {% if skill.icon_class %}
+                                    <i class="{{ skill.icon_class }} text-3xl {% if skill.color %}text-{{ skill.color }}{% else %}text-primary-color{% endif %} mr-4 group-hover:scale-110 transition-transform duration-300"></i>
+                                    {% else %}
+                                    <i class="fas fa-code text-3xl text-primary-color mr-4 group-hover:scale-110 transition-transform duration-300"></i>
+                                    {% endif %}
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-white mb-1">{{ skill.name }}</h4>
+                                        {% if skill.proficiency %}
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-gray-400">Tingkat Keahlian</span>
+                                            <span class="text-sm font-semibold text-primary-color">{{ skill.proficiency }}%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                                            <div class="bg-gradient-to-r from-primary-color to-blue-400 h-3 rounded-full transition-all duration-1000 ease-out skill-progress" 
+                                                 style="width: 0%" 
+                                                 data-width="{{ skill.proficiency }}%">
+                                                <div class="h-full bg-white opacity-20 animate-pulse"></div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if skill.description %}
+                                <p class="text-sm text-gray-400 mt-3">{{ skill.description }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="text-center text-gray-400">
+                    <i class="fas fa-code text-6xl mb-4 opacity-50"></i>
+                    <p class="text-lg">Data keahlian belum tersedia.</p>
+                    <p class="text-sm mt-2">Silakan tambahkan keahlian melalui admin panel.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Bagian Projects -->
+        <section id="projects" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Proyek <span class="text-primary-color">Terbaru</span></h2>
+                
+                {% if project_categories %}
+                    {% for category in project_categories %}
+                    <div class="mb-12">
+                        <h3 class="text-2xl font-bold text-white mb-8 text-center">{{ category.name }}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid-{{ forloop.counter }}">
+                            {% for project in category.project_set.all %}
+                            <div class="bg-[#1f1f33] p-6 rounded-3xl shadow-xl project-card cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl card-hover group {% if forloop.counter > 6 %}hidden project-hidden{% endif %}" data-project-id="{{ project.id }}">
+                                <div class="relative overflow-hidden rounded-xl mb-4">
+                                    {% if project.projectimage_set.first %}
+                                    <img src="{{ project.projectimage_set.first.image.url }}" alt="{{ project.title }}" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                                    {% else %}
+                                    <img src="{% static 'img/project-placeholder.svg' %}" alt="{{ project.title }}" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.src='https://placehold.co/400x250/33334a/fff?text=Project'">
+                                    {% endif %}
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="absolute top-4 right-4 bg-primary-color text-white px-3 py-1 rounded-full text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Lihat Detail
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-primary-color transition-colors duration-300">{{ project.title }}</h3>
+                                <p class="text-gray-400 text-sm mb-4 line-clamp-2">
+                                    {{ project.short_description }}
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    {% for tech in project.technologies.all|slice:":3" %}
+                                    <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full transition-colors duration-300 hover:bg-primary-color hover:text-white">{{ tech.name }}</span>
+                                    {% endfor %}
+                                    {% if project.technologies.all|length > 3 %}
+                                    <span class="bg-gray-600 text-gray-400 text-xs font-semibold px-2.5 py-1 rounded-full">+{{ project.technologies.all|length|add:"-3" }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        {% if project.github_url %}
+                                        <a href="{{ project.github_url }}" target="_blank" class="text-gray-400 hover:text-primary-color transition-colors duration-300" onclick="event.stopPropagation();">
+                                            <i class="fab fa-github text-lg"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if project.live_url %}
+                                        <a href="{{ project.live_url }}" target="_blank" class="text-gray-400 hover:text-primary-color transition-colors duration-300" onclick="event.stopPropagation();">
+                                            <i class="fas fa-external-link-alt text-lg"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    <span class="text-xs text-gray-500">{{ project.created_at|date:"M Y" }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if category.project_set.all|length > 6 %}
+                        <div class="text-center mt-8">
+                            <button class="show-more-projects bg-primary-color hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105" data-category="{{ forloop.counter }}">
+                                <span class="button-text">Lihat Semua Proyek ({{ category.project_set.all|length }})</span>
+                                <i class="fas fa-chevron-down ml-2 transition-transform duration-300"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% elif projects %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid">
+                    {% for project in projects %}
+                    <div class="bg-[#1f1f33] p-6 rounded-3xl shadow-xl project-card cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl card-hover group {% if forloop.counter > 6 %}hidden project-hidden{% endif %}" data-project-id="{{ project.id }}">
+                        <div class="relative overflow-hidden rounded-xl mb-4">
+                            {% if project.projectimage_set.first %}
+                            <img src="{{ project.projectimage_set.first.image.url }}" alt="{{ project.title }}" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
+                            {% else %}
+                            <img src="{% static 'img/project-placeholder.svg' %}" alt="{{ project.title }}" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.src='https://placehold.co/400x250/33334a/fff?text=Project'">
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div class="absolute top-4 right-4 bg-primary-color text-white px-3 py-1 rounded-full text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                Lihat Detail
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-primary-color transition-colors duration-300">{{ project.title }}</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">
+                            {{ project.short_description }}
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            {% for tech in project.technologies.all|slice:":3" %}
+                            <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full transition-colors duration-300 hover:bg-primary-color hover:text-white">{{ tech.name }}</span>
+                            {% endfor %}
+                            {% if project.technologies.all|length > 3 %}
+                            <span class="bg-gray-600 text-gray-400 text-xs font-semibold px-2.5 py-1 rounded-full">+{{ project.technologies.all|length|add:"-3" }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                {% if project.github_url %}
+                                <a href="{{ project.github_url }}" target="_blank" class="text-gray-400 hover:text-primary-color transition-colors duration-300" onclick="event.stopPropagation();">
+                                    <i class="fab fa-github text-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if project.live_url %}
+                                <a href="{{ project.live_url }}" target="_blank" class="text-gray-400 hover:text-primary-color transition-colors duration-300" onclick="event.stopPropagation();">
+                                    <i class="fas fa-external-link-alt text-lg"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <span class="text-xs text-gray-500">{{ project.created_at|date:"M Y" }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if projects|length > 6 %}
+                <div class="text-center mt-8">
+                    <button class="show-more-projects bg-primary-color hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105" data-category="main">
+                        <span class="button-text">Lihat Semua Proyek ({{ projects|length }})</span>
+                        <i class="fas fa-chevron-down ml-2 transition-transform duration-300"></i>
+                    </button>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-center text-gray-400">
+                    <i class="fas fa-folder-open text-6xl mb-4 opacity-50"></i>
+                    <p class="text-lg">Data proyek belum tersedia.</p>
+                    <p class="text-sm mt-2">Silakan tambahkan proyek melalui admin panel.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Modal Project Detail -->
+        <div id="project-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300">
+            <div class="bg-[#1a1a2e] rounded-3xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto transform scale-95 transition-all duration-300">
+                <div class="sticky top-0 bg-[#1a1a2e] p-6 border-b border-gray-700 flex justify-between items-center rounded-t-3xl">
+                    <h2 id="modal-project-title" class="text-2xl font-bold text-white">Project Title</h2>
+                    <button id="close-project-modal" class="text-gray-400 hover:text-white transition-colors duration-300 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div id="modal-project-content" class="p-6">
+                    <!-- Project Image Gallery -->
+                    <div id="modal-project-gallery" class="mb-6">
+                        <div class="relative">
+                            <img id="modal-project-main-image" src="" alt="" class="w-full h-64 md:h-80 object-cover rounded-xl">
+                            <div id="modal-project-thumbnails" class="flex gap-2 mt-4 overflow-x-auto">
+                                <!-- Thumbnails will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Info -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Main Content -->
+                        <div class="lg:col-span-2">
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-white mb-3">Deskripsi Project</h3>
+                                <div id="modal-project-description" class="text-gray-300 leading-relaxed">
+                                    <!-- Description will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-white mb-3">Fitur Utama</h3>
+                                <ul id="modal-project-features" class="space-y-2 text-gray-300">
+                                    <!-- Features will be populated by JavaScript -->
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Sidebar -->
+                        <div class="lg:col-span-1">
+                            <!-- Technologies -->
+                            <div class="bg-[#1f1f33] p-4 rounded-xl mb-6">
+                                <h3 class="text-lg font-bold text-white mb-3">Teknologi</h3>
+                                <div id="modal-project-technologies" class="flex flex-wrap gap-2">
+                                    <!-- Technologies will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <!-- Project Links -->
+                            <div class="bg-[#1f1f33] p-4 rounded-xl mb-6">
+                                <h3 class="text-lg font-bold text-white mb-3">Links</h3>
+                                <div id="modal-project-links" class="space-y-3">
+                                    <!-- Links will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <!-- Project Details -->
+                            <div class="bg-[#1f1f33] p-4 rounded-xl">
+                                <h3 class="text-lg font-bold text-white mb-3">Detail</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Status:</span>
+                                        <span id="modal-project-status" class="text-white">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Tanggal:</span>
+                                        <span id="modal-project-date" class="text-white">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Kategori:</span>
+                                        <span id="modal-project-category" class="text-white">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian Experience -->
+        <section id="experience" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Pengalaman <span class="text-primary-color">Kerja</span></h2>
+                {% if experience %}
+                <div class="space-y-8 relative after:absolute after:inset-y-0 after:w-1 after:bg-primary-color after:left-[50%] after:transform after:-translate-x-1/2 after:rounded-full hidden md:block experience-timeline">
+                    {% for exp in experience %}
+                    <!-- Pengalaman {{ forloop.counter }} -->
+                    <div class="flex justify-between items-center w-full experience-item animate-on-scroll">
+                        {% if forloop.counter|divisibleby:2 %}
+                        <!-- Pengalaman Kanan -->
+                        <div class="w-1/2"></div>
+                        <div class="w-1/2 pl-8">
+                            <div class="bg-[#1f1f33] p-6 rounded-3xl shadow-xl transition-transform duration-300 hover:scale-105 card-hover">
+                                <h3 class="text-2xl font-bold text-white mb-1">{{ exp.title }}</h3>
+                                <p class="text-primary-color">{{ exp.company }}</p>
+                                <p class="text-sm text-gray-500">{{ exp.start_date|date:"M Y" }} - {% if exp.is_current %}Sekarang{% else %}{{ exp.end_date|date:"M Y" }}{% endif %}</p>
+                                {% if exp.location %}<p class="text-sm text-gray-500">{{ exp.location }}</p>{% endif %}
+                                <div class="mt-4 text-gray-300 space-y-2">
+                                    {{ exp.description|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Pengalaman Kiri -->
+                        <div class="w-1/2 pr-8">
+                            <div class="bg-[#1f1f33] p-6 rounded-3xl shadow-xl text-right transition-transform duration-300 hover:scale-105 card-hover">
+                                <h3 class="text-2xl font-bold text-white mb-1">{{ exp.title }}</h3>
+                                <p class="text-primary-color">{{ exp.company }}</p>
+                                <p class="text-sm text-gray-500">{{ exp.start_date|date:"M Y" }} - {% if exp.is_current %}Sekarang{% else %}{{ exp.end_date|date:"M Y" }}{% endif %}</p>
+                                {% if exp.location %}<p class="text-sm text-gray-500">{{ exp.location }}</p>{% endif %}
+                                <div class="mt-4 text-gray-300 space-y-2">
+                                    {{ exp.description|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-1/2"></div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Mobile Experience Layout -->
+                <div class="md:hidden space-y-6">
+                    {% for exp in experience %}
+                    <div class="bg-[#1f1f33] p-6 rounded-3xl shadow-xl transition-transform duration-300 hover:scale-105 card-hover">
+                        <h3 class="text-2xl font-bold text-white mb-1">{{ exp.title }}</h3>
+                        <p class="text-primary-color">{{ exp.company }}</p>
+                        <p class="text-sm text-gray-500">{{ exp.start_date|date:"M Y" }} - {% if exp.is_current %}Sekarang{% else %}{{ exp.end_date|date:"M Y" }}{% endif %}</p>
+                        {% if exp.location %}<p class="text-sm text-gray-500">{{ exp.location }}</p>{% endif %}
+                        <div class="mt-4 text-gray-300 space-y-2">
+                            {{ exp.description|linebreaks }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-gray-400">
+                    <p>Data pengalaman kerja belum tersedia.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Bagian Certificates -->
+        <section id="certificates" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Sertifikat <span class="text-primary-color">Saya</span></h2>
+                
+                <!-- Mobile Expand/Collapse Button -->
+                <div class="md:hidden text-center mb-6">
+                    <button id="certificates-toggle" class="bg-primary-color text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:bg-opacity-80">
+                        <span id="certificates-toggle-text">Lihat Semua Sertifikat</span>
+                        <i id="certificates-toggle-icon" class="fas fa-chevron-down ml-2 transition-transform duration-300"></i>
+                    </button>
+                </div>
+                
+                <div id="certificates-content" class="certificates-expandable">
+                    {% if certificate_categories %}
+                        <!-- Kategori Sertifikat -->
+                        <div class="flex justify-center mb-8">
+                            <div class="flex flex-wrap justify-center gap-4">
+                                <button class="certificate-filter-btn active" data-filter="all">Semua</button>
+                                {% for category in certificate_categories %}
+                                <button class="certificate-filter-btn" data-filter="{{ category.name|slugify }}">{{ category.name }}</button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                            {% for category, certs in certificates_by_category.items %}
+                                {% for cert in certs %}
+                                <div class="bg-[#1f1f33] p-6 rounded-3xl shadow-xl text-center transition-transform duration-300 hover:scale-105 card-hover certificate-card cursor-pointer certificate-item" data-certificate-id="{{ cert.id }}" data-category="{{ category.name|slugify }}">
+                                    {% if cert.icon_class %}
+                                    <i class="{{ cert.icon_class }} text-5xl {% if cert.color %}text-{{ cert.color }}{% else %}text-yellow-500{% endif %} mb-4"></i>
+                                    {% else %}
+                                    <i class="fas fa-award text-5xl text-yellow-500 mb-4"></i>
+                                    {% endif %}
+                                    <h3 class="text-2xl font-bold text-white mb-2">{{ cert.title }}</h3>
+                                    <p class="text-gray-400">{{ cert.issuing_organization }}</p>
+                                    {% if cert.date_issued %}
+                                    <p class="text-sm text-gray-500">{{ cert.date_issued|date:"F Y" }}</p>
+                                    {% endif %}
+                                    {% if cert.credential_id %}
+                                    <p class="text-xs text-gray-500">ID: {{ cert.credential_id }}</p>
+                                    {% endif %}
+                                    {% if cert.certificate_url %}
+                                    <a href="{{ cert.certificate_url }}" target="_blank" class="inline-block mt-4 text-primary-color hover:text-[var(--primary-color)] transition-colors">Lihat Sertifikat <i class="fas fa-arrow-right ml-1"></i></a>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% elif certificates %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                            {% for cert in certificates %}
+                            <div class="bg-[#1f1f33] p-6 rounded-3xl shadow-xl text-center transition-transform duration-300 hover:scale-105 card-hover certificate-card cursor-pointer" data-certificate-id="{{ cert.id }}">
+                                {% if cert.icon_class %}
+                                <i class="{{ cert.icon_class }} text-5xl {% if cert.color %}text-{{ cert.color }}{% else %}text-yellow-500{% endif %} mb-4"></i>
+                                {% else %}
+                                <i class="fas fa-award text-5xl text-yellow-500 mb-4"></i>
+                                {% endif %}
+                                <h3 class="text-2xl font-bold text-white mb-2">{{ cert.title }}</h3>
+                                <p class="text-gray-400">{{ cert.issuing_organization }}</p>
+                                {% if cert.date_issued %}
+                                <p class="text-sm text-gray-500">{{ cert.date_issued|date:"F Y" }}</p>
+                                {% endif %}
+                                {% if cert.credential_id %}
+                                <p class="text-xs text-gray-500">ID: {{ cert.credential_id }}</p>
+                                {% endif %}
+                                {% if cert.certificate_url %}
+                                <a href="{{ cert.certificate_url }}" target="_blank" class="inline-block mt-4 text-primary-color hover:text-[var(--primary-color)] transition-colors">Lihat Sertifikat <i class="fas fa-arrow-right ml-1"></i></a>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <div class="text-center text-gray-400">
+                        <p>Data sertifikat belum tersedia.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fitur: Modal Sertifikat -->
+        <div id="certificate-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-certificate-modal">&times;</span>
+                <div id="modal-certificate-content">
+                    <!-- Konten akan dimuat di sini oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian Blog -->
+        <section id="blog" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Blog <span class="text-primary-color">Terbaru</span></h2>
+                
+                {% if blog_posts %}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {% for post in blog_posts %}
+                        <div class="bg-[#1f1f33] rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 hover:scale-105 card-hover">
+                            <div class="h-48 overflow-hidden">
+                                {% if post.featured_image %}
+                                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <img src="https://placehold.co/600x400/1f1f33/fff?text=Blog+Post" alt="{{ post.title }}" class="w-full h-full object-cover">
+                                {% endif %}
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center text-sm text-gray-400 mb-3">
+                                    <span class="flex items-center"><i class="far fa-calendar-alt mr-2"></i> {{ post.published_date|date:"d M Y" }}</span>
+                                    <span class="mx-2">•</span>
+                                    <span class="flex items-center"><i class="far fa-folder mr-2"></i> {{ post.category.name }}</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-white mb-3">{{ post.title }}</h3>
+                                <p class="text-gray-400 mb-4">{{ post.excerpt|truncatewords:20 }}</p>
+                                <button class="text-primary-color hover:text-[var(--primary-color)] font-semibold flex items-center transition-colors blog-detail-btn" data-blog-id="{{ post.id }}">
+                                    Baca Selengkapnya <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="text-center mt-12">
+                        <button id="load-more-blog" class="btn-secondary inline-flex items-center">
+                            <i class="fas fa-sync-alt mr-2"></i> Muat Lebih Banyak
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="text-center text-gray-400">
+                        <p>Data blog belum tersedia.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        
+        <!-- Fitur: Modal Blog -->
+        <div id="blog-modal" class="modal">
+            <div class="modal-content max-w-4xl">
+                <span class="close-btn" id="close-blog-modal">&times;</span>
+                <div id="modal-blog-content" class="p-6">
+                    <!-- Konten blog akan dimuat di sini oleh JavaScript -->
+                    <div class="text-center text-gray-400">
+                        <p>Pilih artikel blog untuk melihat detail.</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian Contact -->
+        <section id="contact" class="py-20 px-8 animate-on-scroll">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Hubungi <span class="text-primary-color">Saya</span></h2>
+                <div class="flex flex-col md:flex-row items-start gap-12">
+                    <div class="md:w-1/2">
+                        <h3 class="text-3xl font-bold text-white mb-4">Kirim Pesan</h3>
+                        <form id="contact-form" class="space-y-6 bg-[#1f1f33] p-8 rounded-3xl shadow-xl">
+                            <div>
+                                <label for="name" class="block text-gray-400 mb-2">Nama Lengkap</label>
+                                <input type="text" id="name" name="name" class="w-full bg-gray-700 text-white border-0 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]" required>
+                            </div>
+                            <div>
+                                <label for="email" class="block text-gray-400 mb-2">Email</label>
+                                <input type="email" id="email" name="email" class="w-full bg-gray-700 text-white border-0 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]" required>
+                            </div>
+                            <div>
+                                <label for="message" class="block text-gray-400 mb-2">Pesan</label>
+                                <textarea id="message" name="message" rows="5" class="w-full bg-gray-700 text-white border-0 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary w-full text-center">Kirim Pesan</button>
+                        </form>
+                    </div>
+                    <div class="md:w-1/2">
+                        <h3 class="text-3xl font-bold text-white mb-4">Informasi Kontak</h3>
+                        <div class="space-y-6 bg-[#1f1f33] p-8 rounded-3xl shadow-xl">
+                            {% if user_profile %}
+                                {% if user_profile.email %}
+                                <div class="flex items-center space-x-4">
+                                    <i class="fas fa-envelope text-primary-color text-2xl"></i>
+                                    <span class="text-gray-300">{{ user_profile.email }}</span>
+                                    <button onclick="copyToClipboard('{{ user_profile.email }}')" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-copy"></i></button>
+                                </div>
+                                {% endif %}
+                                {% if user_profile.phone %}
+                                <div class="flex items-center space-x-4">
+                                    <i class="fas fa-phone text-primary-color text-2xl"></i>
+                                    <span class="text-gray-300">{{ user_profile.phone }}</span>
+                                    <button onclick="copyToClipboard('{{ user_profile.phone }}')" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-copy"></i></button>
+                                </div>
+                                {% endif %}
+                                {% if user_profile.location %}
+                                <div class="flex items-center space-x-4">
+                                    <i class="fas fa-map-marker-alt text-primary-color text-2xl"></i>
+                                    <span class="text-gray-300">{{ user_profile.location }}</span>
+                                </div>
+                                {% endif %}
+                                {% if user_profile.linkedin_url %}
+                                <div class="flex items-center space-x-4">
+                                    <i class="fab fa-linkedin text-primary-color text-2xl"></i>
+                                    <a href="{{ user_profile.linkedin_url }}" target="_blank" class="text-gray-300 hover:text-white transition-colors">{{ user_profile.linkedin_url }}</a>
+                                </div>
+                                {% endif %}
+                                {% if user_profile.github_url %}
+                                <div class="flex items-center space-x-4">
+                                    <i class="fab fa-github text-primary-color text-2xl"></i>
+                                    <a href="{{ user_profile.github_url }}" target="_blank" class="text-gray-300 hover:text-white transition-colors">{{ user_profile.github_url }}</a>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="text-center text-gray-400">
+                                    <p>Informasi kontak belum tersedia.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-gray-500 border-t border-gray-700">
+        <div class="container mx-auto">
+            {% if site_settings %}
+                <p>&copy; {% now "Y" %} {{ site_settings.site_name }}. All Rights Reserved.</p>
+            {% else %}
+                <p>&copy; {% now "Y" %} Portfolio Website. All Rights Reserved.</p>
+            {% endif %}
+            <div class="mt-4 flex justify-center space-x-6 text-2xl">
+                {% if user_profile %}
+                    {% if user_profile.linkedin_url %}
+                        <a href="{{ user_profile.linkedin_url }}" target="_blank" class="hover:text-white transition-colors"><i class="fab fa-linkedin"></i></a>
+                    {% endif %}
+                    {% if user_profile.github_url %}
+                        <a href="{{ user_profile.github_url }}" target="_blank" class="hover:text-white transition-colors"><i class="fab fa-github"></i></a>
+                    {% endif %}
+                    {% if user_profile.instagram_url %}
+                        <a href="{{ user_profile.instagram_url }}" target="_blank" class="hover:text-white transition-colors"><i class="fab fa-instagram"></i></a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </footer>
+
+    <!-- Fitur: Floating buttons -->
+    <div class="floating-buttons">
+        <button id="scroll-to-top-btn" class="scroll-to-top-btn" title="Kembali ke Atas">
+            <i class="fas fa-arrow-up text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Fitur: Tombol ganti warna -->
+    <button id="color-changer-toggle" class="color-changer-toggle-btn" title="Ganti Warna Tema">
+        <i class="fas fa-palette text-2xl"></i>
+    </button>
+    <div id="color-changer-panel" class="color-changer-panel">
+        <button class="color-btn" data-color="#6a35ff" style="background-color: #6a35ff;"></button>
+        <button class="color-btn" data-color="#10b981" style="background-color: #10b981;"></button>
+        <button class="color-btn" data-color="#3b82f6" style="background-color: #3b82f6;"></button>
+        <button class="color-btn" data-color="#ef4444" style="background-color: #ef4444;"></button>
+    </div>
+
+
+    <!-- anime.js untuk animasi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- JavaScript Libraries -->    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Custom JavaScript Files -->
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/three-background.js' %}"></script>
+    <script src="{% static 'js/animations.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <script>
+        // Main JavaScript Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme Toggle Functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+            const themeTransition = document.getElementById('theme-transition');
+            const body = document.body;
+            
+            // Check for saved theme preference or default to dark mode
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            if (currentTheme === 'light') {
+                body.classList.add('light-mode');
+                updateThemeIcons(true);
+            }
+            
+            function toggleTheme() {
+                // Add transition animation
+                themeTransition.classList.add('active');
+                
+                setTimeout(() => {
+                    body.classList.toggle('light-mode');
+                    const isLight = body.classList.contains('light-mode');
+                    
+                    // Save theme preference
+                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                    
+                    // Update icons
+                    updateThemeIcons(isLight);
+                    
+                    // Remove transition animation
+                    setTimeout(() => {
+                        themeTransition.classList.remove('active');
+                    }, 100);
+                }, 150);
+            }
+            
+            function updateThemeIcons(isLight) {
+                const desktopIcon = document.querySelector('#theme-toggle .theme-icon');
+                const mobileIcon = document.querySelector('#mobile-theme-toggle .mobile-theme-icon');
+                const mobileText = document.querySelector('.mobile-theme-text');
+                
+                if (desktopIcon) {
+                    desktopIcon.className = isLight ? 'theme-icon fas fa-sun' : 'theme-icon fas fa-moon';
+                }
+                if (mobileIcon) {
+                    mobileIcon.className = isLight ? 'mobile-theme-icon fas fa-sun' : 'mobile-theme-icon fas fa-moon';
+                }
+                if (mobileText) {
+                    mobileText.textContent = isLight ? 'Light Mode' : 'Dark Mode';
+                }
+            }
+            
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            if (mobileThemeToggle) {
+                mobileThemeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            // Enhanced Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+            
+            function openMobileMenu() {
+                mobileMenu.classList.add('open');
+                mobileMenuToggle.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('open');
+                mobileMenuToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            if (mobileMenuToggle && mobileMenu) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    if (mobileMenu.classList.contains('open')) {
+                        closeMobileMenu();
+                    } else {
+                        openMobileMenu();
+                    }
+                });
+            }
+            
+            if (mobileMenuClose && mobileMenu) {
+                mobileMenuClose.addEventListener('click', closeMobileMenu);
+            }
+            
+            // Mobile menu links
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link-enhanced');
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    closeMobileMenu();
+                });
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileMenu.classList.contains('open') && 
+                    !mobileMenu.contains(e.target) && 
+                    !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // Make closeMobileMenu globally accessible
+            window.closeMobileMenu = closeMobileMenu;
+            
+            // Desktop navigation links
+            const navLinks = document.querySelectorAll('.nav-link-enhanced');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        window.scrollTo({
+                            top: targetSection.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Scroll to top button
+            const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
+            if (scrollToTopBtn) {
+                window.addEventListener('scroll', function() {
+                    if (window.pageYOffset > 300) {
+                        scrollToTopBtn.style.opacity = '1';
+                    } else {
+                        scrollToTopBtn.style.opacity = '0';
+                    }
+                });
+                
+                scrollToTopBtn.addEventListener('click', function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+            
+            // Color changer functionality
+            const colorChangerToggle = document.getElementById('color-changer-toggle');
+            const colorChangerPanel = document.getElementById('color-changer-panel');
+            const colorButtons = document.querySelectorAll('.color-btn');
+            
+            if (colorChangerToggle && colorChangerPanel) {
+                colorChangerToggle.addEventListener('click', function() {
+                    colorChangerPanel.classList.toggle('open');
+                });
+                
+                // Close color panel when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!colorChangerToggle.contains(event.target) && !colorChangerPanel.contains(event.target)) {
+                        colorChangerPanel.classList.remove('open');
+                    }
+                });
+                
+                // Change primary color
+                colorButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const color = this.getAttribute('data-color');
+                        document.documentElement.style.setProperty('--primary-color', color);
+                        
+                        // Remove active class from all buttons
+                        colorButtons.forEach(btn => btn.classList.remove('active'));
+                        
+                        // Add active class to clicked button
+                        this.classList.add('active');
+                        
+                        // Save color preference to localStorage
+                        localStorage.setItem('primary-color', color);
+                    });
+                });
+            }
+            
+            // Theme toggle functionality is handled above
+            
+            // Load saved preferences
+            function loadSavedPreferences() {
+                // Load primary color
+                const savedColor = localStorage.getItem('primary-color');
+                if (savedColor) {
+                    document.documentElement.style.setProperty('--primary-color', savedColor);
+                    
+                    // Set active class on color button
+                    const activeColorButton = document.querySelector(`.color-btn[data-color="${savedColor}"]`);
+                    if (activeColorButton) {
+                        activeColorButton.classList.add('active');
+                    }
+                }
+                
+                // Load theme
+                const isLightTheme = localStorage.getItem('light-theme') === 'true';
+                if (isLightTheme) {
+                    document.body.classList.add('light-theme');
+                    
+                    // Update theme toggle icons
+                    const themeIcons = document.querySelectorAll('#theme-toggle i, #mobile-theme-toggle i');
+                    themeIcons.forEach(icon => {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    });
+                }
+            }
+            
+            // Call load preferences
+            loadSavedPreferences();
+            
+            // Blog Modal Functionality
+            const blogModal = document.getElementById('blog-modal');
+            const closeBlogModal = document.getElementById('close-blog-modal');
+            const blogDetailBtns = document.querySelectorAll('.blog-detail-btn');
+            const modalBlogContent = document.getElementById('modal-blog-content');
+            
+            // Sample blog data (in a real app, this would come from Django)
+            const blogData = [
+                {
+                    id: 1,
+                    title: "Membangun Website Portfolio dengan Django dan Tailwind CSS",
+                    date: "15 Juni 2023",
+                    category: "Web Development",
+                    views: "1.2K",
+                    image: "https://placehold.co/1200x600/1f1f33/fff?text=Blog+Featured+Image",
+                    content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.</p>
+                    
+                    <p>Dalam artikel ini, kita akan membahas langkah-langkah untuk membuat website portfolio profesional menggunakan Django sebagai backend dan Tailwind CSS untuk styling. Website portfolio adalah cara yang efektif untuk menampilkan karya dan keahlian Anda kepada calon klien atau employer.</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-6 mb-3">Persiapan Awal</h3>
+                    
+                    <p>Sebelum memulai, pastikan Anda telah menginstal:</p>
+                    
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Python 3.8 atau lebih tinggi</li>
+                        <li>Django 4.0 atau lebih tinggi</li>
+                        <li>Node.js dan npm</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-bold text-white mt-6 mb-3">Langkah 1: Setup Project Django</h3>
+                    
+                    <p>Buat virtual environment dan install Django:</p>
+                    
+                    <div class="bg-gray-900 p-4 rounded-lg my-4 overflow-x-auto">
+                        <code class="text-green-400">
+                            $ python -m venv venv<br>
+                            $ source venv/bin/activate  # Untuk Linux/Mac<br>
+                            $ venv\Scripts\activate  # Untuk Windows<br>
+                            $ pip install django
+                        </code>
+                    </div>
+                    
+                    <p>Buat project Django baru:</p>
+                    
+                    <div class="bg-gray-900 p-4 rounded-lg my-4 overflow-x-auto">
+                        <code class="text-green-400">
+                            $ django-admin startproject portfolio<br>
+                            $ cd portfolio<br>
+                            $ python manage.py startapp frontend
+                        </code>
+                    </div>`,
+                    tags: ["Django", "TailwindCSS", "WebDevelopment", "Portfolio"],
+                    relatedPosts: [
+                        {
+                            title: "Membuat Animasi dengan CSS dan JavaScript",
+                            date: "5 Mei 2023",
+                            image: "https://placehold.co/100x100/1f1f33/fff?text=Related"
+                        },
+                        {
+                            title: "Deployment Django ke Production Server",
+                            date: "20 April 2023",
+                            image: "https://placehold.co/100x100/1f1f33/fff?text=Related"
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "Prinsip Desain UI/UX untuk Developer",
+                    date: "28 Mei 2023",
+                    category: "UI/UX Design",
+                    views: "980",
+                    image: "https://placehold.co/1200x600/1f1f33/fff?text=UI/UX+Design",
+                    content: `<p>Sebagai seorang developer, memahami prinsip-prinsip dasar UI/UX design sangat penting untuk menciptakan aplikasi yang tidak hanya berfungsi dengan baik tetapi juga nyaman digunakan.</p>
+                    
+                    <p>Dalam artikel ini, kita akan membahas beberapa prinsip desain UI/UX yang penting untuk diketahui oleh developer, serta bagaimana menerapkannya dalam proyek pengembangan web.</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-6 mb-3">Apa itu UI/UX Design?</h3>
+                    
+                    <p>UI (User Interface) berkaitan dengan tampilan visual dari aplikasi, sedangkan UX (User Experience) berkaitan dengan bagaimana pengguna berinteraksi dengan aplikasi tersebut. Keduanya saling terkait dan sama-sama penting untuk menciptakan produk digital yang sukses.</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-6 mb-3">Prinsip-Prinsip Dasar UI/UX</h3>
+                    
+                    <ol class="list-decimal pl-6 space-y-2">
+                        <li><strong>Konsistensi</strong> - Gunakan elemen desain yang konsisten di seluruh aplikasi</li>
+                        <li><strong>Hierarki Visual</strong> - Atur elemen berdasarkan kepentingannya</li>
+                        <li><strong>Feedback</strong> - Berikan respons visual untuk setiap interaksi pengguna</li>
+                        <li><strong>Efisiensi</strong> - Minimalkan langkah yang diperlukan untuk menyelesaikan tugas</li>
+                        <li><strong>Aksesibilitas</strong> - Pastikan aplikasi dapat digunakan oleh semua orang</li>
+                    </ol>`,
+                    tags: ["UI/UX", "Design", "WebDevelopment", "UserExperience"],
+                    relatedPosts: [
+                        {
+                            title: "Color Theory untuk Web Design",
+                            date: "15 April 2023",
+                            image: "https://placehold.co/100x100/1f1f33/fff?text=Related"
+                        },
+                        {
+                            title: "Membuat Form yang User-Friendly",
+                            date: "10 Maret 2023",
+                            image: "https://placehold.co/100x100/1f1f33/fff?text=Related"
+                        }
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "Optimasi Performa Website dengan Modern JavaScript",
+                    date: "10 April 2023",
+                    category: "JavaScript",
+                    views: "756",
+                    image: "https://placehold.co/1200x600/1f1f33/fff?text=JavaScript",
+                    content: `<p>Performa website yang baik sangat penting untuk pengalaman pengguna dan SEO. Dalam artikel ini, kita akan membahas berbagai teknik optimasi menggunakan JavaScript modern.</p>
+                    
+                    <p>JavaScript telah berkembang pesat dalam beberapa tahun terakhir, dengan fitur-fitur baru yang dapat membantu meningkatkan performa website secara signifikan.</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-6 mb-3">Lazy Loading</h3>
+                    
+                    <p>Salah satu teknik paling efektif untuk meningkatkan performa adalah dengan menerapkan lazy loading untuk gambar dan konten:</p>
+                    
+                    <div class="bg-gray-900 p-4 rounded-lg my-4 overflow-x-auto">
+                        <code class="text-green-400">
+                            // Menggunakan Intersection Observer API
+                            const images = document.querySelectorAll('img[data-src]');
+                            
+                            const imgObserver = new IntersectionObserver((entries, observer) => {
+                              entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                  const img = entry.target;
+                                  img.src = img.dataset.src;
+                                  img.removeAttribute('data-src');
+                                  observer.unobserve(img);
+                                }
+                              });
+                            });
+                            
+                            images.forEach(img => imgObserver.observe(img));
+                        </code>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-white mt-6 mb-3">Code Splitting</h3>
+                    
+                    <p>Dengan menggunakan bundler seperti Webpack, kita dapat memecah kode JavaScript menjadi beberapa bundle yang lebih kecil:</p>
+                    
+                    <div class="bg-gray-900 p-4 rounded-lg my-4 overflow-x-auto">
+                        <code class="text-green-400">
+                            // Menggunakan dynamic import
+                            button.addEventListener('click', async () => {
+                              const module = await import('./heavy-module.js');
+                              module.doSomething();
+                            });
+                        </code>
+                    </div>`,
+                    tags: ["JavaScript", "WebPerformance", "Optimization", "FrontEnd"],
+                    relatedPosts: [
+                        {
+                            title: "Mengenal Web Vitals untuk SEO",
+                            date: "25 Maret 2023",
+                            image: "https://placehold.co/100x100/1f1f33/fff?text=Related"
+                        },
+                        {
+                            title: "Teknik Caching untuk Web Developer",
+                            date: "5 Februari 2023",
+                            image: "https://placehold.co/100x100/1f1f33/fff?text=Related"
+                        }
+                    ]
+                }
+            ];
+            
+            // Open blog modal when clicking on blog detail button
+            blogDetailBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const blogId = parseInt(this.getAttribute('data-blog-id'));
+                    const blog = blogData.find(b => b.id === blogId);
+                    
+                    if (blog) {
+                        // Update modal content with blog data
+                        document.getElementById('blog-title').textContent = blog.title;
+                        document.getElementById('blog-date').textContent = blog.date;
+                        document.getElementById('blog-category').textContent = blog.category;
+                        document.getElementById('blog-views').textContent = blog.views + ' Views';
+                        document.getElementById('blog-content').innerHTML = blog.content;
+                        
+                        // Update featured image
+                        const featuredImg = modalBlogContent.querySelector('.blog-detail-placeholder .h-64 img');
+                        featuredImg.src = blog.image;
+                        featuredImg.alt = blog.title;
+                        
+                        // Update tags
+                        const tagsContainer = modalBlogContent.querySelector('.flex.flex-wrap.gap-2');
+                        tagsContainer.innerHTML = '';
+                        blog.tags.forEach(tag => {
+                            const tagSpan = document.createElement('span');
+                            tagSpan.className = 'bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-full';
+                            tagSpan.textContent = '#' + tag;
+                            tagsContainer.appendChild(tagSpan);
+                        });
+                        
+                        // Update related posts
+                        const relatedPostsContainer = modalBlogContent.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.gap-4');
+                        relatedPostsContainer.innerHTML = '';
+                        blog.relatedPosts.forEach(post => {
+                            const postLink = document.createElement('a');
+                            postLink.href = '#';
+                            postLink.className = 'flex items-center p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors';
+                            postLink.innerHTML = `
+                                <div class="w-16 h-16 rounded-lg overflow-hidden mr-3">
+                                    <img src="${post.image}" alt="${post.title}" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold">${post.title}</h4>
+                                    <p class="text-xs text-gray-400">${post.date}</p>
+                                </div>
+                            `;
+                            relatedPostsContainer.appendChild(postLink);
+                        });
+                        
+                        // Show the modal
+                        blogModal.classList.add('open');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            });
+            
+            // Close blog modal when clicking on close button
+            if (closeBlogModal && blogModal) {
+                closeBlogModal.addEventListener('click', function() {
+                    blogModal.classList.remove('open');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+            
+            // Close blog modal when clicking outside the modal content
+            if (blogModal) {
+                blogModal.addEventListener('click', function(event) {
+                    if (event.target === blogModal) {
+                        blogModal.classList.remove('open');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+            
+            // Load More Blog Posts button functionality
+            const loadMoreBtn = document.getElementById('load-more-blog');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function() {
+                    // In a real app, this would load more posts from the server
+                    // For this demo, we'll just show a message
+                    this.innerHTML = '<i class="fas fa-check mr-2"></i> Semua Post Dimuat';
+                    this.disabled = true;
+                    this.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

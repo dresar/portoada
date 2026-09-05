@@ -1,0 +1,9 @@
+{% extends 'custom_admin/crud_base.html' %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Define fields for Education model
+    window.templateFields = ['user', 'institution', 'degree', 'field_of_study', 'start_date', 'end_date', 'grade', 'description', 'is_current'];
+</script>
+{% endblock %}

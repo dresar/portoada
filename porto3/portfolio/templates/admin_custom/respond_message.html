@@ -1,0 +1,377 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}Balas Pesan - {{ message.subject }}{% endblock %}
+{% block page_title %}Balas Pesan{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <a href="{% url 'admin_custom:message_detail' message.id %}" 
+               class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Kembali
+            </a>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Balas Pesan</h1>
+        </div>
+    </div>
+    
+    <!-- Original Message -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                <i class="fas fa-envelope mr-2"></i>
+                Pesan Asli
+            </h3>
+        </div>
+        
+        <div class="px-6 py-4">
+            <div class="flex items-start space-x-4">
+                <!-- Avatar -->
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <span class="text-lg font-bold text-white">
+                            {{ message.name|first|upper }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Message Info -->
+                <div class="flex-1">
+                    <div class="flex items-center space-x-4 mb-2">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                            {{ message.name }}
+                        </h4>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ message.created_at|date:"d M Y, H:i" }}
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-600 dark:text-gray-400 mb-2">
+                        <i class="fas fa-envelope mr-1"></i>
+                        {{ message.email }}
+                    </p>
+                    
+                    <h5 class="font-medium text-gray-800 dark:text-gray-200 mb-3">
+                        {{ message.subject }}
+                    </h5>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                            {{ message.message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Response Form -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                <i class="fas fa-reply mr-2"></i>
+                Tulis Balasan
+            </h3>
+        </div>
+        
+        <form method="post" class="px-6 py-6 space-y-6">
+            {% csrf_token %}
+            
+            <!-- Email Preview -->
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    <span class="text-sm font-medium text-blue-800 dark:text-blue-200">Preview Email</span>
+                </div>
+                
+                <div class="space-y-2 text-sm">
+                    <div class="flex">
+                        <span class="font-medium text-gray-700 dark:text-gray-300 w-16">Kepada:</span>
+                        <span class="text-gray-600 dark:text-gray-400">{{ message.email }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-medium text-gray-700 dark:text-gray-300 w-16">Subjek:</span>
+                        <span class="text-gray-600 dark:text-gray-400">Re: {{ message.subject }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Response Message -->
+            <div>
+                <label for="response_message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Pesan Balasan *
+                </label>
+                <textarea name="response_message" id="response_message" rows="8" required
+                          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                          placeholder="Tulis balasan Anda di sini...">Halo {{ message.name }},
+
+Terima kasih atas pesan Anda. 
+
+
+
+Salam,
+Admin</textarea>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Pesan ini akan dikirim ke email {{ message.email }}
+                </p>
+            </div>
+            
+            <!-- Email Options -->
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="checkbox" id="send_copy" name="send_copy" value="1" checked
+                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                    <label for="send_copy" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Kirim salinan ke email admin
+                    </label>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="mark_resolved" name="mark_resolved" value="1" checked
+                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                    <label for="mark_resolved" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Tandai pesan sebagai sudah dibalas
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Quick Templates -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Template Cepat
+                </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button type="button" onclick="insertTemplate('thanks')" 
+                            class="text-left px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="font-medium text-gray-900 dark:text-gray-100">Terima Kasih</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Template ucapan terima kasih</div>
+                    </button>
+                    
+                    <button type="button" onclick="insertTemplate('info')" 
+                            class="text-left px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="font-medium text-gray-900 dark:text-gray-100">Informasi</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Template memberikan informasi</div>
+                    </button>
+                    
+                    <button type="button" onclick="insertTemplate('follow_up')" 
+                            class="text-left px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="font-medium text-gray-900 dark:text-gray-100">Follow Up</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Template tindak lanjut</div>
+                    </button>
+                    
+                    <button type="button" onclick="insertTemplate('meeting')" 
+                            class="text-left px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="font-medium text-gray-900 dark:text-gray-100">Jadwal Meeting</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Template mengatur pertemuan</div>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex space-x-3">
+                    <button type="button" onclick="previewEmail()" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-eye mr-2"></i>
+                        Preview
+                    </button>
+                    
+                    <button type="button" onclick="saveDraft()" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-save mr-2"></i>
+                        Simpan Draft
+                    </button>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <a href="{% url 'admin_custom:message_detail' message.id %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        Batal
+                    </a>
+                    
+                    <button type="submit" 
+                            class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Kirim Balasan
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+                <i class="fas fa-eye mr-2"></i>
+                Preview Email
+            </h3>
+            <button onclick="closePreviewModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+            <!-- Email Header -->
+            <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <div class="space-y-2 text-sm">
+                    <div class="flex">
+                        <span class="font-medium text-gray-700 dark:text-gray-300 w-16">Dari:</span>
+                        <span class="text-gray-600 dark:text-gray-400">admin@portfolio.com</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-medium text-gray-700 dark:text-gray-300 w-16">Kepada:</span>
+                        <span class="text-gray-600 dark:text-gray-400">{{ message.email }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-medium text-gray-700 dark:text-gray-300 w-16">Subjek:</span>
+                        <span class="text-gray-600 dark:text-gray-400">Re: {{ message.subject }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Email Body -->
+            <div class="p-4">
+                <div id="previewContent" class="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                    <!-- Content will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex justify-end mt-4 space-x-3">
+            <button onclick="closePreviewModal()" 
+                    class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md hover:bg-gray-600">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const templates = {
+    thanks: `Halo {{ message.name }},
+
+Terima kasih atas pesan Anda. Saya sangat menghargai waktu yang Anda luangkan untuk menghubungi saya.
+
+Saya akan segera meninjau pesan Anda dan memberikan respons yang sesuai dalam waktu dekat.
+
+Salam hangat,
+Admin`,
+    
+    info: `Halo {{ message.name }},
+
+Terima kasih atas pertanyaan Anda. Berikut adalah informasi yang Anda butuhkan:
+
+[Silakan tambahkan informasi di sini]
+
+Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi saya kembali.
+
+Salam,
+Admin`,
+    
+    follow_up: `Halo {{ message.name }},
+
+Saya ingin menindaklanjuti pesan Anda sebelumnya. 
+
+[Tambahkan detail tindak lanjut di sini]
+
+Mohon beri tahu saya jika ada hal lain yang dapat saya bantu.
+
+Salam,
+Admin`,
+    
+    meeting: `Halo {{ message.name }},
+
+Terima kasih atas minat Anda. Saya akan senang untuk mengatur pertemuan dengan Anda.
+
+Berikut adalah beberapa waktu yang tersedia:
+- [Tanggal dan waktu 1]
+- [Tanggal dan waktu 2]
+- [Tanggal dan waktu 3]
+
+Silakan pilih waktu yang paling sesuai untuk Anda, atau beri tahu saya jika ada waktu lain yang lebih baik.
+
+Salam,
+Admin`
+};
+
+function insertTemplate(templateName) {
+    const textarea = document.getElementById('response_message');
+    const template = templates[templateName];
+    if (template) {
+        textarea.value = template;
+        textarea.focus();
+    }
+}
+
+function previewEmail() {
+    const message = document.getElementById('response_message').value;
+    document.getElementById('previewContent').textContent = message;
+    document.getElementById('previewModal').classList.remove('hidden');
+}
+
+function closePreviewModal() {
+    document.getElementById('previewModal').classList.add('hidden');
+}
+
+function saveDraft() {
+    const message = document.getElementById('response_message').value;
+    localStorage.setItem('draft_{{ message.id }}', message);
+    
+    // Show success message
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+    toast.textContent = 'Draft berhasil disimpan!';
+    document.body.appendChild(toast);
+    
+    setTimeout(function() {
+        document.body.removeChild(toast);
+    }, 3000);
+}
+
+// Load draft on page load
+window.addEventListener('load', function() {
+    const draft = localStorage.getItem('draft_{{ message.id }}');
+    if (draft) {
+        const textarea = document.getElementById('response_message');
+        if (confirm('Ditemukan draft yang tersimpan. Apakah Anda ingin memuatnya?')) {
+            textarea.value = draft;
+        }
+    }
+});
+
+// Auto-save draft every 30 seconds
+setInterval(function() {
+    const message = document.getElementById('response_message').value;
+    if (message.trim() !== '') {
+        localStorage.setItem('draft_{{ message.id }}', message);
+    }
+}, 30000);
+
+// Clear draft when form is submitted
+document.querySelector('form').addEventListener('submit', function() {
+    localStorage.removeItem('draft_{{ message.id }}');
+});
+
+// Character counter
+const textarea = document.getElementById('response_message');
+const counter = document.createElement('div');
+counter.className = 'text-sm text-gray-500 dark:text-gray-400 mt-1';
+counter.textContent = '0 karakter';
+textarea.parentNode.appendChild(counter);
+
+textarea.addEventListener('input', function() {
+    const length = this.value.length;
+    counter.textContent = `${length} karakter`;
+});
+
+// Initial count
+textarea.dispatchEvent(new Event('input'));
+</script>
+{% endblock %}

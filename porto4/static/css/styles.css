@@ -1,0 +1,1384 @@
+/* Main Styles for Portfolio Website */
+:root {
+    --primary-color: #6a35ff;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #121223;
+    color: #e0e0e0;
+    overflow-x: hidden; /* Mencegah horizontal scroll */
+    margin: 0;
+    padding: 0;
+}
+
+/* Section styling */
+section {
+    padding: 2rem 0;
+    position: relative;
+}
+
+/* Hero section */
+.hero {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    section {
+        padding: 1rem 0;
+    }
+    
+    .hero {
+        min-height: 80vh;
+        padding: 0.5rem 0;
+    }
+    
+    /* Mobile Header Adjustments */
+    header {
+        padding: 0.5rem 0;
+    }
+    
+    .logo-animated {
+        font-size: 1.5rem;
+    }
+    
+    /* Mobile Theme Toggle */
+    .mobile-theme-toggle-track {
+        background: #374151;
+    }
+    
+    body.light-mode .mobile-theme-toggle-track {
+        background: #fbbf24;
+    }
+    
+    body.light-mode .mobile-theme-toggle-thumb {
+        transform: translateX(20px);
+        background: #1f2937;
+    }
+    
+    body.light-mode .mobile-theme-icon {
+        color: #fbbf24;
+    }
+    
+    /* Mobile Menu Responsive */
+    .mobile-menu-enhanced {
+        width: 100%;
+    }
+    
+    .mobile-nav-link-enhanced {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+    
+    /* Hamburger responsive */
+    .hamburger-btn {
+        width: 28px;
+        height: 24px;
+    }
+    
+    .hamburger-line {
+        height: 3px;
+    }
+}
+
+/* Latar belakang gradien */
+.gradient-bg {
+    background-image: linear-gradient(to right, #0a0a1a, #1a1a2b);
+}
+
+/* Efek latar belakang partikel */
+.particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    background-color: rgba(144, 238, 144, 0.5); /* Hijau muda */
+    border-radius: 50%;
+    pointer-events: none;
+    animation: moveParticle linear infinite;
+}
+
+.particle.blue { background-color: rgba(135, 206, 250, 0.5); } /* Biru muda */
+.particle.purple { background-color: rgba(147, 112, 219, 0.5); } /* Ungu */
+.particle.orange { background-color: rgba(255, 165, 0, 0.5); } /* Oranye */
+.particle.yellow { background-color: rgba(255, 255, 0, 0.5); } /* Kuning */
+.particle.red { background-color: rgba(255, 99, 71, 0.5); } /* Merah */
+
+/* Animasi pergerakan partikel */
+@keyframes moveParticle {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100vh) scale(0); opacity: 0; }
+}
+
+.particle-1 { animation-duration: 20s; }
+.particle-2 { animation-duration: 15s; animation-delay: 5s; }
+.particle-3 { animation-duration: 25s; animation-delay: 10s; }
+.particle-4 { animation-duration: 18s; animation-delay: 2s; }
+.particle-5 { animation-duration: 22s; animation-delay: 8s; }
+
+/* Modal styling */
+.modal {
+    display: none; /* Sembunyikan secara default */
+    position: fixed; /* Posisi tetap */
+    z-index: 1000; /* Letakkan di atas yang lain */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.modal.open {
+    display: flex;
+    opacity: 1;
+}
+.modal-content {
+    background-color: #1f1f33;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.modal.open .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: #aaa;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close-btn:hover {
+    color: white;
+}
+
+/* Blog styling */
+.blog-detail-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.blog-detail-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.blog-detail-btn:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Styling untuk tombol */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+    transform: scale(1.05);
+}
+.btn-secondary {
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Styling untuk tombol filter sertifikat */
+.certificate-filter-btn {
+    background-color: #1f1f33;
+    color: #aaa;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid #2d2d4a;
+}
+.certificate-filter-btn:hover {
+    color: white;
+    border-color: var(--primary-color);
+}
+.certificate-filter-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+.nav-link {
+    transition: color 0.3s ease, transform 0.3s ease;
+    position: relative;
+}
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+.nav-link:hover::after, .nav-link.active::after {
+    width: 100%;
+}
+
+/* Mengganti warna hardcode dengan variabel */
+.text-primary-color { color: var(--primary-color); }
+.bg-primary-color { background-color: var(--primary-color); }
+.border-primary-color { border-color: var(--primary-color); }
+
+/* Kustomisasi scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1f1f33;
+}
+::-webkit-scrollbar-thumb {
+    background: #4a4a6e;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #6a6a8e;
+}
+
+/* Enhanced Header Animations */
+.header-animated {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.logo-animated:hover {
+    text-shadow: 0 0 20px rgba(106, 53, 255, 0.5);
+}
+
+/* Enhanced Navigation Links */
+.nav-link-enhanced {
+    position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-link-enhanced:hover {
+    background: rgba(106, 53, 255, 0.1);
+    color: #6a35ff;
+    transform: translateY(-2px);
+}
+
+.nav-link-enhanced::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6a35ff, #8b5cf6);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link-enhanced:hover::after {
+    width: 80%;
+}
+
+/* Hamburger Menu */
+.hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 24px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.hamburger-line {
+    width: 100%;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Enhanced Mobile Menu */
+.mobile-menu-enhanced {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(135deg, #121223 0%, #1f1f33 100%);
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu-enhanced.open {
+    transform: translateX(0);
+}
+
+.mobile-menu-content {
+    padding: 2rem 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.mobile-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg);
+}
+
+.mobile-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+
+.mobile-nav-list li {
+    margin-bottom: 0.5rem;
+}
+
+.mobile-nav-link-enhanced {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.mobile-nav-link-enhanced i {
+    margin-right: 0.75rem;
+    width: 16px;
+    color: #6a35ff;
+}
+
+.mobile-nav-link-enhanced:hover {
+    background: rgba(106, 53, 255, 0.1);
+    color: #6a35ff;
+    transform: translateX(5px);
+}
+
+.mobile-theme-toggle-container {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-theme-toggle-track {
+    width: 40px;
+    height: 20px;
+    background: #374151;
+    border-radius: 10px;
+    position: relative;
+    margin-right: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.mobile-theme-toggle-thumb {
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-theme-icon {
+    font-size: 0.6rem;
+    color: #374151;
+}
+
+.mobile-theme-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Light Mode Styles */
+body.light-mode {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #1a202c;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+body.light-mode .gradient-bg {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+body.light-mode header {
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .nav-link-enhanced {
+    color: #4a5568;
+}
+
+body.light-mode .nav-link-enhanced:hover {
+    color: #6a35ff;
+    background: rgba(106, 53, 255, 0.1);
+}
+
+body.light-mode .logo-animated {
+    color: #1a202c;
+}
+
+body.light-mode .hamburger-line {
+    background: #4a5568;
+}
+
+body.light-mode .mobile-menu-enhanced {
+    background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+}
+
+body.light-mode .mobile-nav-link-enhanced {
+    color: #4a5568;
+}
+
+body.light-mode .mobile-nav-link-enhanced:hover {
+    color: #6a35ff;
+}
+
+body.light-mode .mobile-menu-header h3 {
+    color: #1a202c;
+}
+
+body.light-mode .mobile-close-btn {
+    color: #4a5568;
+}
+
+body.light-mode .mobile-theme-text {
+    color: #4a5568;
+}
+
+/* Theme Transition Animation */
+.theme-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #6a35ff 0%, transparent 70%);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.theme-transition.active {
+    opacity: 0.3;
+    animation: themeRipple 0.6s ease-out;
+}
+
+@keyframes themeRipple {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* Animasi on-scroll */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.animate-on-scroll.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Efek typing untuk teks */
+.typing-effect {
+    display: inline-block;
+    overflow: hidden;
+    border-right: .15em solid var(--primary-color);
+    white-space: nowrap;
+    letter-spacing: .15em;
+    animation: 
+        typing 3.5s steps(40, end),
+        blink-caret .75s step-end infinite;
+}
+.typing-effect-2 {
+    display: inline-block;
+    overflow: hidden;
+    border-right: .15em solid transparent;
+    white-space: nowrap;
+    letter-spacing: .05em;
+    width: 0;
+    animation: 
+        typing-2 2s steps(40, end) forwards 3.5s,
+        blink-caret-2 .75s step-end infinite 3.5s;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes typing-2 {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--primary-color); }
+}
+@keyframes blink-caret-2 {
+    from, to { border-color: transparent }
+    50% { border-color: #6a35ff; }
+}
+
+/* Efek hover pada kartu */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Floating buttons */
+.floating-buttons {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 900;
+}
+.floating-buttons a, .floating-buttons button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    color: white;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    opacity: 0.9;
+    transform: translateX(100px);
+    animation: slideInButtons 0.6s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation-delay: calc(var(--btn-index, 0) * 0.1s);
+    font-size: 1.2rem;
+}
+.floating-buttons a:hover, .floating-buttons button:hover {
+    transform: scale(1.15) translateX(0);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    opacity: 1;
+    border-color: rgba(255, 255, 255, 0.5);
+    filter: brightness(1.2);
+}
+
+@keyframes slideInButtons {
+    0% {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    70% {
+        transform: translateX(-10px);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 0.9;
+    }
+}
+
+/* Assign animation delay to each button */
+.floating-buttons a:nth-child(1), .floating-buttons button:nth-child(1) { --btn-index: 1; }
+.floating-buttons a:nth-child(2), .floating-buttons button:nth-child(2) { --btn-index: 2; }
+.floating-buttons a:nth-child(3), .floating-buttons button:nth-child(3) { --btn-index: 3; }
+.floating-buttons a:nth-child(4), .floating-buttons button:nth-child(4) { --btn-index: 4; }
+.floating-buttons a:nth-child(5), .floating-buttons button:nth-child(5) { --btn-index: 5; }
+.whatsapp-btn {
+    background-color: #25d366;
+}
+.email-btn {
+    background-color: #ea4335;
+}
+.phone-btn {
+    background-color: #4285f4;
+}
+.github-btn {
+    background-color: #333;
+}
+.scroll-to-top-btn {
+    background-color: var(--primary-color);
+    position: fixed;
+    bottom: 4rem;
+    left: 1rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 900;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.2s ease, color 0.2s ease;
+    color: white;
+}
+
+.scroll-to-top-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Mobile responsive adjustments for scroll-to-top */
+@media (max-width: 768px) {
+    .scroll-to-top-btn {
+        bottom: 3rem;
+        left: 1rem;
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* Tooltip untuk floating buttons */
+.floating-buttons a[title]:hover::after,
+.floating-buttons button[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    right: 65px;
+    background-color: #1f1f33;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateX(-10px);
+    animation: fadeInTooltip 0.3s forwards;
+}
+
+@keyframes fadeInTooltip {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Desktop Theme Toggle */
+.theme-toggle-container {
+    position: relative;
+}
+
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+}
+
+.theme-toggle-track {
+    width: 50px;
+    height: 25px;
+    background: linear-gradient(135deg, #374151, #4b5563);
+    border-radius: 25px;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-thumb {
+    width: 21px;
+    height: 21px;
+    background: linear-gradient(135deg, #ffffff, #f3f4f6);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.theme-icon {
+    font-size: 0.7rem;
+    color: #374151;
+    transition: all 0.3s ease;
+}
+
+/* Light mode styles */
+body.light-mode .theme-toggle-track {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+body.light-mode .theme-toggle-thumb {
+    transform: translateX(25px);
+    background: linear-gradient(135deg, #1f2937, #374151);
+}
+
+body.light-mode .theme-icon {
+    color: #fbbf24;
+}
+
+body.light-mode .theme-icon::before {
+    content: '\f185'; /* fa-sun */
+}
+
+/* Hover effects */
+.theme-toggle-btn:hover .theme-toggle-track {
+    transform: scale(1.05);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 15px rgba(106, 53, 255, 0.3);
+}
+
+.theme-toggle-btn:hover .theme-toggle-thumb {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.light-mode .theme-toggle-btn:hover .theme-toggle-thumb {
+    transform: translateX(25px) scale(1.1);
+}
+
+/* Tombol dan panel ganti warna */
+#color-changer-toggle {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1f1f33;
+    color: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 900;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+#color-changer-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    #color-changer-toggle {
+        bottom: 1rem;
+        left: 1rem;
+        width: 45px;
+        height: 45px;
+    }
+    
+    #color-changer-panel {
+        bottom: 1rem;
+        left: 4rem;
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    #color-changer-panel .color-btn {
+        width: 25px;
+        height: 25px;
+    }
+}
+#color-changer-panel {
+    position: fixed;
+    bottom: 1rem;
+    left: 4rem;
+    background-color: #1f1f33;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 900;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-20px);
+    transition: all 0.3s ease;
+}
+#color-changer-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+#color-changer-panel .color-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease;
+}
+#color-changer-panel .color-btn:hover, #color-changer-panel .color-btn.active {
+    border-color: white;
+}
+
+/* Animasi untuk kartu proyek */
+.project-card {
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Animasi untuk kartu skill */
+.skill-item {
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Animasi untuk kartu sertifikat */
+.certificate-item {
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Expand/Collapse Styles for Mobile */
+.about-expandable,
+.projects-expandable,
+.certificates-expandable {
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .about-expandable.collapsed {
+        max-height: 300px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .about-expandable.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: linear-gradient(transparent, var(--bg-color));
+        pointer-events: none;
+    }
+    
+    .projects-expandable.collapsed {
+        max-height: 600px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .projects-expandable.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: linear-gradient(transparent, var(--bg-color));
+        pointer-events: none;
+    }
+    
+    .certificates-expandable.collapsed {
+        max-height: 600px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .certificates-expandable.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: linear-gradient(transparent, var(--bg-color));
+        pointer-events: none;
+    }
+}
+
+/* Animasi untuk bagian home */
+.animate-in-home-delay-1, 
+.animate-in-home-delay-2, 
+.animate-in-home-delay-3, 
+.animate-in-home-delay-4, 
+.animate-in-home-delay-5, 
+.animate-in-home-delay-6 {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Canvas untuk Three.js */
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+}
+
+/* Animasi kotak bergerak untuk foto profil */
+.floating-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.floating-shape {
+    position: absolute;
+    background: linear-gradient(45deg, var(--primary-color), rgba(106, 53, 255, 0.3));
+    border-radius: 10px;
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-shape:nth-child(1) {
+    width: 60px;
+    height: 60px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.floating-shape:nth-child(2) {
+    width: 40px;
+    height: 40px;
+    top: 70%;
+    right: 20%;
+    animation-delay: 2s;
+    border-radius: 50%;
+}
+
+.floating-shape:nth-child(3) {
+    width: 80px;
+    height: 30px;
+    top: 30%;
+    right: 10%;
+    animation-delay: 4s;
+}
+
+.floating-shape:nth-child(4) {
+    width: 50px;
+    height: 50px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 1s;
+    border-radius: 50%;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+/* Responsivitas */
+@media (max-width: 768px) {
+    .experience-timeline .after\:left-\[50\%\] {
+        left: 10px;
+        transform: none;
+    }
+    .experience-item > div {
+        width: 100% !important;
+        text-align: left !important;
+        margin-left: 20px;
+        padding-left: 1.5rem;
+        padding-right: 0;
+    }
+    
+    .floating-shape {
+        display: none;
+    }
+    
+    h1 {
+        font-size: 2.5rem !important;
+    }
+    
+    h2 {
+        font-size: 2rem !important;
+    }
+    
+    .typing-effect {
+        font-size: 1.8rem !important;
+    }
+    
+    .floating-buttons {
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    .color-changer-toggle-btn {
+        bottom: 1rem;
+        left: 1rem;
+    }
+    
+    .color-changer-panel {
+        bottom: 1rem;
+        left: 5rem;
+    }
+    
+    .modal-content {
+        padding: 1.5rem;
+        width: 95%;
+    }
+    
+    .certificate-filter-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem !important;
+    }
+    
+    h2 {
+        font-size: 1.8rem !important;
+    }
+    
+    .typing-effect {
+        font-size: 1.5rem !important;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .floating-buttons a, .floating-buttons button,
+    #color-changer-toggle {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .modal-content {
+        padding: 1rem;
+    }
+    
+    .certificate-filter-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Animasi tambahan */
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.slide-in-left {
+    animation: slideInLeft 1s ease-in-out;
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.slide-in-right {
+    animation: slideInRight 1s ease-in-out;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.bounce-in {
+    animation: bounceIn 1s ease-in-out;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    70% { transform: scale(0.9); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Animasi untuk Three.js objek */
+.three-js-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Loader */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #121223;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Animation for project cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Skill progress bar animation */
+.skill-progress {
+    transition: width 1s ease-out;
+}
+
+/* Project modal animations */
+.modal-enter {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-leave {
+    animation: modalFadeOut 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* Enhanced hover effects for project cards */
+.project-card {
+    transition: all 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Skill item hover effects */
+.skill-item {
+    transition: all 0.3s ease;
+}
+
+.skill-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(106, 53, 255, 0.2);
+}
+
+/* Button hover animations */
+.show-more-projects {
+    transition: all 0.3s ease;
+}
+
+.show-more-projects:hover {
+    box-shadow: 0 8px 25px rgba(106, 53, 255, 0.3);
+}
+
+/* Responsive adjustments for new features */
+@media (max-width: 768px) {
+    .project-card {
+        margin-bottom: 1rem;
+    }
+    
+    .skill-item {
+        margin-bottom: 1rem;
+    }
+    
+    .show-more-projects {
+        width: 100%;
+        margin-top: 1rem;
+    }
+}

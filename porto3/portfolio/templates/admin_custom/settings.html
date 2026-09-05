@@ -1,0 +1,598 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}Pengaturan Admin{% endblock %}
+{% block page_title %}Pengaturan{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Pengaturan Admin</h1>
+        <button onclick="saveAllSettings()" 
+                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+            <i class="fas fa-save mr-2"></i>
+            Simpan Semua
+        </button>
+    </div>
+    
+    <!-- Settings Tabs -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+                <button onclick="switchTab('general')" 
+                        class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm active"
+                        data-tab="general">
+                    <i class="fas fa-cog mr-2"></i>
+                    Umum
+                </button>
+                
+                <button onclick="switchTab('site')" 
+                        class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        data-tab="site">
+                    <i class="fas fa-globe mr-2"></i>
+                    Situs
+                </button>
+                
+                <button onclick="switchTab('admin')" 
+                        class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        data-tab="admin">
+                    <i class="fas fa-user-shield mr-2"></i>
+                    Admin
+                </button>
+                
+                <button onclick="switchTab('backup')" 
+                        class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        data-tab="backup">
+                    <i class="fas fa-database mr-2"></i>
+                    Backup
+                </button>
+                
+                <button onclick="switchTab('integrations')" 
+                        class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        data-tab="integrations">
+                    <i class="fas fa-plug mr-2"></i>
+                    Integrasi
+                </button>
+            </nav>
+        </div>
+        
+        <!-- Tab Content -->
+        <div class="p-6">
+            <!-- General Settings -->
+            <div id="general-tab" class="tab-content">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Pengaturan Umum</h3>
+                
+                <form id="general-form" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Theme Settings -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="theme" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Tema Default
+                            </label>
+                            <select id="theme" name="theme" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                <option value="light" {% if admin_setting.theme == 'light' %}selected{% endif %}>Terang</option>
+                                <option value="dark" {% if admin_setting.theme == 'dark' %}selected{% endif %}>Gelap</option>
+                                <option value="auto" {% if admin_setting.theme == 'auto' %}selected{% endif %}>Otomatis</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="sidebar_position" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Posisi Sidebar
+                            </label>
+                            <select id="sidebar_position" name="sidebar_position" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                <option value="left" {% if admin_setting.sidebar_position == 'left' %}selected{% endif %}>Kiri</option>
+                                <option value="right" {% if admin_setting.sidebar_position == 'right' %}selected{% endif %}>Kanan</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Settings -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Pengaturan Notifikasi</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="email_notifications" name="email_notifications" 
+                                       {% if admin_setting.email_notifications %}checked{% endif %}
+                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                                <label for="email_notifications" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                    Notifikasi Email
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <input type="checkbox" id="browser_notifications" name="browser_notifications" 
+                                       {% if admin_setting.browser_notifications %}checked{% endif %}
+                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                                <label for="browser_notifications" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                    Notifikasi Browser
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <input type="checkbox" id="dashboard_notifications" name="dashboard_notifications" 
+                                       {% if admin_setting.dashboard_notifications %}checked{% endif %}
+                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                                <label for="dashboard_notifications" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                    Notifikasi Dashboard
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Language Settings -->
+                    <div>
+                        <label for="language" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Bahasa Interface
+                        </label>
+                        <select id="language" name="language" 
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            <option value="id" {% if admin_setting.language == 'id' %}selected{% endif %}>Bahasa Indonesia</option>
+                            <option value="en" {% if admin_setting.language == 'en' %}selected{% endif %}>English</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Site Configuration -->
+            <div id="site-tab" class="tab-content hidden">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Konfigurasi Situs</h3>
+                
+                <form id="site-form" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="site_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Judul Situs
+                            </label>
+                            <input type="text" id="site_title" name="site_title" 
+                                   value="{{ site_config.site_title|default:'' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                        </div>
+                        
+                        <div>
+                            <label for="site_tagline" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Tagline Situs
+                            </label>
+                            <input type="text" id="site_tagline" name="site_tagline" 
+                                   value="{{ site_config.site_tagline|default:'' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="site_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Deskripsi Situs
+                        </label>
+                        <textarea id="site_description" name="site_description" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">{{ site_config.site_description|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="contact_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Email Kontak
+                            </label>
+                            <input type="email" id="contact_email" name="contact_email" 
+                                   value="{{ site_config.contact_email|default:'' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                        </div>
+                        
+                        <div>
+                            <label for="contact_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nomor Telepon
+                            </label>
+                            <input type="tel" id="contact_phone" name="contact_phone" 
+                                   value="{{ site_config.contact_phone|default:'' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="contact_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Alamat
+                        </label>
+                        <textarea id="contact_address" name="contact_address" rows="2"
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">{{ site_config.contact_address|default:'' }}</textarea>
+                    </div>
+                    
+                    <!-- SEO Settings -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Pengaturan SEO</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="google_analytics_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Google Analytics ID
+                                </label>
+                                <input type="text" id="google_analytics_id" name="google_analytics_id" 
+                                       value="{{ site_config.google_analytics_id|default:'' }}"
+                                       placeholder="G-XXXXXXXXXX"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="google_tag_manager_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Google Tag Manager ID
+                                </label>
+                                <input type="text" id="google_tag_manager_id" name="google_tag_manager_id" 
+                                       value="{{ site_config.google_tag_manager_id|default:'' }}"
+                                       placeholder="GTM-XXXXXXX"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Maintenance Mode -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Mode Maintenance</h4>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="maintenance_mode" name="maintenance_mode" 
+                                       {% if site_config.maintenance_mode %}checked{% endif %}
+                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                                <label for="maintenance_mode" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                    Aktifkan Mode Maintenance
+                                </label>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                            Ketika diaktifkan, pengunjung akan melihat halaman maintenance.
+                        </p>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Admin Settings -->
+            <div id="admin-tab" class="tab-content hidden">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Pengaturan Admin</h3>
+                
+                <div class="space-y-6">
+                    <!-- Admin Profile -->
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Profil Admin</h4>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-2xl text-indigo-600 dark:text-indigo-400"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-gray-900 dark:text-gray-100">{{ user.get_full_name|default:user.username }}</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ user.email }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Terakhir login: {{ user.last_login|timesince }} yang lalu</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Settings -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Keamanan</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                <div>
+                                    <h5 class="font-medium text-gray-900 dark:text-gray-100">Ubah Password</h5>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Update password akun admin</p>
+                                </div>
+                                <a href="{% url 'admin:password_change' %}" 
+                                   class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <i class="fas fa-key mr-2"></i>
+                                    Ubah
+                                </a>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                <div>
+                                    <h5 class="font-medium text-gray-900 dark:text-gray-100">Sesi Login</h5>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Kelola sesi login aktif</p>
+                                </div>
+                                <button onclick="logoutAllSessions()" 
+                                        class="inline-flex items-center px-3 py-2 border border-red-300 dark:border-red-600 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 dark:text-red-200 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>
+                                    Logout Semua
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Log -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Aktivitas Terbaru</h4>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <div class="space-y-3">
+                                {% for log in recent_activities|slice:":5" %}
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">{{ log.action }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ log.timestamp|timesince }} yang lalu</p>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p class="text-sm text-gray-500 dark:text-gray-400 italic">Belum ada aktivitas</p>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-4">
+                                <a href="{% url 'admin_custom:activity_logs' %}" 
+                                   class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                    Lihat semua aktivitas →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Backup Settings -->
+            <div id="backup-tab" class="tab-content hidden">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Pengaturan Backup</h3>
+                
+                <div class="space-y-6">
+                    <!-- Manual Backup -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">
+                            <i class="fas fa-download mr-2"></i>
+                            Backup Manual
+                        </h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            Buat backup database dan file secara manual.
+                        </p>
+                        <button onclick="createBackup()" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                            <i class="fas fa-database mr-2"></i>
+                            Buat Backup Sekarang
+                        </button>
+                    </div>
+                    
+                    <!-- Backup History -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Riwayat Backup</h4>
+                        <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+                            {% if backup_logs %}
+                            <div class="divide-y divide-gray-200 dark:divide-gray-600">
+                                {% for backup in backup_logs|slice:":5" %}
+                                <div class="p-4 flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-900 dark:text-gray-100">{{ backup.backup_type|title }} Backup</h5>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                            {{ backup.created_at|date:"d M Y, H:i" }} - {{ backup.file_size|filesizeformat }}
+                                        </p>
+                                        {% if backup.notes %}
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ backup.notes }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                               {% if backup.status == 'completed' %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                               {% elif backup.status == 'failed' %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                                               {% else %}bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200{% endif %}">
+                                            {{ backup.get_status_display }}
+                                        </span>
+                                        {% if backup.status == 'completed' %}
+                                        <a href="{{ backup.file_path }}" 
+                                           class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="p-8 text-center">
+                                <i class="fas fa-archive text-4xl text-gray-400 dark:text-gray-600 mb-3"></i>
+                                <p class="text-gray-500 dark:text-gray-400">Belum ada backup yang dibuat</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Integrations -->
+            <div id="integrations-tab" class="tab-content hidden">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Integrasi Pihak Ketiga</h3>
+                
+                <div class="space-y-6">
+                    <!-- API Keys -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">API Keys</h4>
+                        <div class="space-y-4">
+                            {% for api_key in api_keys %}
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                <div>
+                                    <h5 class="font-medium text-gray-900 dark:text-gray-100">{{ api_key.name }}</h5>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ api_key.description }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Dibuat: {{ api_key.created_at|date:"d M Y" }}</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                           {% if api_key.is_active %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                           {% else %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200{% endif %}">
+                                        {% if api_key.is_active %}Aktif{% else %}Tidak Aktif{% endif %}
+                                    </span>
+                                    <button onclick="toggleApiKey({{ api_key.id }})" 
+                                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-8">
+                                <i class="fas fa-key text-4xl text-gray-400 dark:text-gray-600 mb-3"></i>
+                                <p class="text-gray-500 dark:text-gray-400 mb-4">Belum ada API key yang dikonfigurasi</p>
+                                <button onclick="addApiKey()" 
+                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Tambah API Key
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Third Party Services -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Layanan Pihak Ketiga</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for integration in integrations %}
+                            <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h5 class="font-medium text-gray-900 dark:text-gray-100">{{ integration.service_name }}</h5>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                           {% if integration.is_active %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                           {% else %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200{% endif %}">
+                                        {% if integration.is_active %}Terhubung{% else %}Tidak Terhubung{% endif %}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ integration.description }}</p>
+                                <button onclick="configureIntegration('{{ integration.service_name }}')" 
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <i class="fas fa-cog mr-2"></i>
+                                    Konfigurasi
+                                </button>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-2 text-center py-8">
+                                <i class="fas fa-plug text-4xl text-gray-400 dark:text-gray-600 mb-3"></i>
+                                <p class="text-gray-500 dark:text-gray-400">Belum ada integrasi yang dikonfigurasi</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active', 'border-indigo-500', 'text-indigo-600');
+        button.classList.add('border-transparent', 'text-gray-500');
+    });
+    
+    // Show selected tab content
+    document.getElementById(tabName + '-tab').classList.remove('hidden');
+    
+    // Add active class to selected tab button
+    const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
+    activeButton.classList.add('active', 'border-indigo-500', 'text-indigo-600');
+    activeButton.classList.remove('border-transparent', 'text-gray-500');
+}
+
+function saveAllSettings() {
+    const activeTab = document.querySelector('.tab-content:not(.hidden)');
+    const form = activeTab.querySelector('form');
+    
+    if (form) {
+        const formData = new FormData(form);
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Pengaturan berhasil disimpan!', 'success');
+            } else {
+                showNotification('Gagal menyimpan pengaturan!', 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Terjadi kesalahan!', 'error');
+        });
+    }
+}
+
+function createBackup() {
+    if (confirm('Apakah Anda yakin ingin membuat backup sekarang?')) {
+        fetch('{% url "admin_custom:create_backup" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Backup berhasil dibuat!', 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showNotification('Gagal membuat backup!', 'error');
+            }
+        });
+    }
+}
+
+function logoutAllSessions() {
+    if (confirm('Apakah Anda yakin ingin logout dari semua sesi? Anda akan diarahkan ke halaman login.')) {
+        fetch('/admin-custom/logout-all-sessions/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(() => {
+            window.location.href = '{% url "admin_custom:login" %}';
+        });
+    }
+}
+
+function toggleApiKey(apiKeyId) {
+    // Implementation for toggling API key status
+    console.log('Toggle API key:', apiKeyId);
+}
+
+function addApiKey() {
+    // Implementation for adding new API key
+    console.log('Add new API key');
+}
+
+function configureIntegration(serviceName) {
+    // Implementation for configuring integration
+    console.log('Configure integration:', serviceName);
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 3000);
+}
+
+// Auto-save settings on change
+document.addEventListener('change', function(e) {
+    if (e.target.matches('input, select, textarea')) {
+        // Debounce auto-save
+        clearTimeout(window.autoSaveTimeout);
+        window.autoSaveTimeout = setTimeout(() => {
+            saveAllSettings();
+        }, 2000);
+    }
+});
+</script>
+{% endblock %}

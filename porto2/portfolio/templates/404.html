@@ -1,0 +1,112 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Page Not Found - Civil Engineer Portfolio{% endblock %}
+
+{% block extra_css %}
+.error-container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 700;
+    color: #2563eb;
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-illustration {
+    max-width: 100%;
+    height: auto;
+    margin: 2rem 0;
+}
+
+.error-message {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.error-description {
+    color: #6b7280;
+    max-width: 500px;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.back-home-btn {
+    transition: all 0.3s ease;
+}
+
+.back-home-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+{% endblock %}
+
+{% block content %}
+<div class="error-container container mx-auto px-4 py-16">
+    <div class="error-code">404</div>
+    
+    <div class="error-illustration">
+        <svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 600 400">
+            <!-- Building/Bridge Structure -->
+            <g fill="#e5e7eb" stroke="#d1d5db" stroke-width="2">
+                <!-- Foundation -->
+                <rect x="150" y="300" width="300" height="20" rx="2" />
+                
+                <!-- Left Column -->
+                <rect x="170" y="200" width="30" height="100" rx="2" />
+                
+                <!-- Right Column -->
+                <rect x="400" y="200" width="30" height="100" rx="2" />
+                
+                <!-- Middle Column (Broken) -->
+                <rect x="285" y="200" width="30" height="50" rx="2" />
+                <rect x="285" y="270" width="30" height="30" rx="2" />
+                
+                <!-- Top Beam -->
+                <rect x="150" y="180" width="300" height="20" rx="2" />
+            </g>
+            
+            <!-- Broken Part (Gap) -->
+            <g fill="#ef4444" opacity="0.1">
+                <rect x="285" y="250" width="30" height="20" rx="2" />
+            </g>
+            
+            <!-- Warning Signs -->
+            <g>
+                <path d="M285 250 L315 250 L300 270 Z" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+                <text x="300" y="265" text-anchor="middle" font-size="15" font-weight="bold" fill="#7c2d12">!</text>
+            </g>
+            
+            <!-- Construction Hat -->
+            <g transform="translate(350, 150) scale(0.8)">
+                <ellipse cx="30" cy="30" rx="30" ry="10" fill="#f59e0b" />
+                <path d="M10 30 Q30 0 50 30" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+            </g>
+            
+            <!-- Compass/Blueprint -->
+            <g transform="translate(200, 150) scale(0.7)">
+                <circle cx="30" cy="30" r="25" fill="#93c5fd" stroke="#2563eb" stroke-width="2" />
+                <line x1="30" y1="10" x2="30" y2="50" stroke="#1e40af" stroke-width="2" />
+                <line x1="10" y1="30" x2="50" y2="30" stroke="#1e40af" stroke-width="2" />
+                <circle cx="30" cy="30" r="5" fill="#1e40af" />
+            </g>
+        </svg>
+    </div>
+    
+    <h1 class="error-message">Oops! Page Not Found</h1>
+    
+    <p class="error-description">The blueprint for this page seems to be missing. Our civil engineers are working on reconstructing it!</p>
+    
+    <a href="{% url 'main_app:home' %}" class="back-home-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 inline-flex items-center">
+        <i class="fas fa-home mr-2"></i> Back to Home
+    </a>
+</div>
+{% endblock %}

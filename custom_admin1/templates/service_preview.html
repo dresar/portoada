@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Services Offered</h1>
+        
+        <div class="max-w-6xl mx-auto">
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for service in services %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg">
+                    <div class="p-6">
+                        <!-- Service Icon -->
+                        <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-4 mx-auto">
+                            <i class="{{ service.icon|default:'fas fa-cogs' }} text-2xl text-purple-600"></i>
+                        </div>
+                        
+                        <!-- Service Title -->
+                        <h2 class="text-xl font-bold text-center text-gray-800 mb-3">{{ service.title }}</h2>
+                        
+                        <!-- Service Description -->
+                        <p class="text-gray-600 text-center mb-4">{{ service.description|linebreaks }}</p>
+                        
+                        <!-- Service Features -->
+                        {% if service.features.all %}
+                        <div class="mt-4 border-t pt-4">
+                            <h3 class="text-lg font-medium text-gray-800 mb-2">What's Included:</h3>
+                            <ul class="space-y-2">
+                                {% for feature in service.features.all %}
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                    <span class="text-gray-700">{{ feature.description }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Service Price -->
+                        {% if service.price %}
+                        <div class="mt-6 text-center">
+                            <span class="text-2xl font-bold text-purple-600">${{ service.price }}</span>
+                            {% if service.price_suffix %}
+                            <span class="text-gray-500">{{ service.price_suffix }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Contact Button -->
+                        <div class="mt-6 text-center">
+                            <a href="#" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 active:bg-purple-900 focus:outline-none focus:border-purple-900 focus:ring ring-purple-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                <i class="fas fa-envelope mr-2"></i> Inquire Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full bg-white rounded-lg shadow-md p-8 text-center">
+                    <p class="text-gray-500">No services found.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <a href="{% url 'portfolio_admin:service_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Admin
+            </a>
+        </div>
+    </div>
+</body>
+</html>

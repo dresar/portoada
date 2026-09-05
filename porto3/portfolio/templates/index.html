@@ -1,0 +1,780 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio {% if profile %} | {{ profile.name }}{% endif %}</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Swiper JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <!-- Lottie Animation -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navbar -->
+    <header class="bg-white shadow-md fixed w-full z-50 transition duration-300 ease-in-out dark:bg-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-3 sm:py-4">
+                <a href="#" class="text-2xl sm:text-3xl font-bold text-gradient hover:opacity-80 transition-opacity">
+                    Portfolio
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden lg:flex space-x-6 xl:space-x-8">
+                    <a href="#home" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Beranda</a>
+                    <a href="#about" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Tentang</a>
+                    <a href="#services" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Layanan</a>
+                    <a href="#projects" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Proyek</a>
+                    <a href="#education" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Pendidikan</a>
+                    <a href="#experience" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Pengalaman</a>
+                    <a href="#certificates" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Sertifikat</a>
+                    <a href="#contact" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition duration-300 font-medium text-sm xl:text-base">Kontak</a>
+                </nav>
+                
+                <!-- Dark Mode Toggle & Mobile Menu -->
+                <div class="flex items-center space-x-2">
+                    <!-- Dark Mode Toggle -->
+                    <button class="focus:outline-none text-gray-700 dark:text-gray-300 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-300" id="dark-mode-toggle">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Mobile Menu Toggle -->
+                    <button class="lg:hidden focus:outline-none text-gray-700 dark:text-gray-300 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-300" id="menu-toggle">
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="lg:hidden hidden bg-white dark:bg-gray-800 w-full shadow-lg border-t border-gray-200 dark:border-gray-700" id="mobile-menu">
+            <div class="px-4 py-4 space-y-2">
+                <a href="#home" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Beranda</a>
+                <a href="#about" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Tentang Saya</a>
+                <a href="#services" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Layanan</a>
+                <a href="#projects" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Proyek</a>
+                <a href="#education" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Pendidikan</a>
+                <a href="#experience" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Pengalaman</a>
+                <a href="#certificates" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Sertifikat</a>
+                <a href="#contact" class="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-300 font-medium py-3 px-2 rounded-md">Kontak</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="min-h-screen flex items-center justify-center bg-gradient-custom py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
+            <div class="container mx-auto max-w-7xl">
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+                    <div class="w-full lg:w-1/2 text-center lg:text-left mb-8 lg:mb-0" data-aos="fade-right" data-aos-duration="1200">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 animate__animated animate__fadeInDown leading-tight">
+                            Halo, Saya <br class="sm:hidden"><span id="typed-name" class="text-yellow-300">{% if profile %}{{ profile.name }}{% endif %}</span>
+                        </h1>
+                        <p class="text-lg sm:text-xl lg:text-2xl text-white mb-6 sm:mb-8 animate__animated animate__fadeInUp animate__delay-1s leading-relaxed">
+                            <span id="typed-profession">{% if profile %}{{ profile.short_intro }}{% endif %}</span>
+                        </p>
+                        <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-3 sm:gap-4 animate__animated animate__fadeInUp animate__delay-2s">
+                            <a href="#contact" class="bg-white text-indigo-600 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold hover:bg-gray-100 transition duration-300 shadow-lg transform hover:scale-105 text-center">
+                                Hubungi Saya
+                            </a>
+                            <a href="#projects" class="bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold hover:bg-white hover:text-indigo-600 transition duration-300 shadow-lg transform hover:scale-105 text-center">
+                                Lihat Proyek
+                            </a>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2 flex justify-center" data-aos="fade-left" data-aos-duration="1200">
+                        <div class="w-full max-w-sm sm:max-w-md lg:max-w-lg">
+                            <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_iorpbol0.json" background="transparent" speed="1" style="width: 100%; height: auto;" loop autoplay></lottie-player>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section id="about" class="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16 text-gradient" data-aos="fade-up">Tentang Saya</h2>
+                {% if profile %}
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+                    <div class="w-full lg:w-2/5 mb-8 lg:mb-0" data-aos="fade-right" data-aos-duration="1200">
+                        <div class="relative max-w-sm sm:max-w-md mx-auto lg:mx-0">
+                            <img src="{{ profile.profile_image.url }}" alt="{{ profile.name }}" class="rounded-2xl shadow-2xl w-full h-auto object-cover transform hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition duration-300"></div>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-3/5 lg:pl-8 xl:pl-16" data-aos="fade-left" data-aos-duration="1200">
+                        <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200">Siapa Saya?</h3>
+                        <div class="prose prose-lg dark:prose-invert max-w-none mb-6 sm:mb-8">
+                            <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-base sm:text-lg">
+                                {{ profile.bio }}
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base"><span class="font-semibold text-gray-800 dark:text-gray-200">Nama:</span> {{ profile.name }}</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base"><span class="font-semibold text-gray-800 dark:text-gray-200">Email:</span> {{ profile.email }}</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base"><span class="font-semibold text-gray-800 dark:text-gray-200">Lokasi:</span> {{ profile.location }}</p>
+                            </div>
+                            {% if profile.contact.available_for_freelance %}
+                            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base"><span class="font-semibold text-gray-800 dark:text-gray-200">Ketersediaan:</span> <span class="text-green-600 dark:text-green-400 font-medium">Freelance</span></p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <a href="#" class="inline-block bg-gradient-custom text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold hover:opacity-90 transition duration-300 shadow-lg transform hover:scale-105 text-center w-full sm:w-auto">
+                            <i class="fas fa-download mr-2"></i>Unduh CV
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400">Tidak ada data profil yang tersedia.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-100 dark:bg-gray-800">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-4xl font-bold text-center mb-16 text-gradient" data-aos="fade-up">Layanan Saya</h2>
+                {% if services %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    {% for service in services %}
+                    <div class="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
+                        <div class="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-3xl mb-6 mx-auto">
+                            <i class="{{ service.icon }}"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-center mb-4 text-gray-800 dark:text-gray-200">{{ service.title }}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-center">
+                            {{ service.description }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400">Tidak ada layanan yang tersedia.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16 text-gradient" data-aos="fade-up">Pendidikan</h2>
+                {% if education %}
+                <div class="relative">
+                    <!-- Timeline Line - Hidden on mobile -->
+                    <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-indigo-500"></div>
+                    
+                    <!-- Timeline Items -->
+                    <div class="space-y-8 md:space-y-16">
+                        {% for edu in education %}
+                        <div class="flex flex-col md:flex-row items-center relative" data-aos="fade-up" data-aos-duration="800">
+                            {% if forloop.counter0|divisibleby:2 %}
+                            <!-- Left side on desktop -->
+                            <div class="w-full md:w-1/2 md:pr-8 lg:pr-16 mb-6 md:mb-0 md:text-right">
+                                <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2 border border-gray-200 dark:border-gray-700">
+                                    <h3 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 text-indigo-600 dark:text-indigo-400">{{ edu.degree }}</h3>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-2 font-medium text-base sm:text-lg">{{ edu.institution }}</p>
+                                    {% if edu.field_of_study %}
+                                    <p class="text-gray-500 dark:text-gray-500 mb-3 text-sm sm:text-base">{{ edu.field_of_study }}</p>
+                                    {% endif %}
+                                    <p class="text-gray-500 dark:text-gray-500 text-sm sm:text-base mb-4">
+                                        {{ edu.start_date|date:"M Y" }} - {% if edu.is_current %}Sekarang{% else %}{{ edu.end_date|date:"M Y" }}{% endif %}
+                                    </p>
+                                    {% if edu.description %}
+                                    <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed">{{ edu.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Timeline dot -->
+                            <div class="hidden md:flex z-10 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-indigo-600 items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+                                <i class="fas fa-graduation-cap text-white text-lg lg:text-xl"></i>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-8 lg:pl-16"></div>
+                            {% else %}
+                            <!-- Right side on desktop -->
+                            <div class="w-full md:w-1/2 md:pr-8 lg:pr-16 md:order-2">
+                                <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2 border border-gray-200 dark:border-gray-700">
+                                    <h3 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 text-indigo-600 dark:text-indigo-400">{{ edu.degree }}</h3>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-2 font-medium text-base sm:text-lg">{{ edu.institution }}</p>
+                                    {% if edu.field_of_study %}
+                                    <p class="text-gray-500 dark:text-gray-500 mb-3 text-sm sm:text-base">{{ edu.field_of_study }}</p>
+                                    {% endif %}
+                                    <p class="text-gray-500 dark:text-gray-500 text-sm sm:text-base mb-4">
+                                        {{ edu.start_date|date:"M Y" }} - {% if edu.is_current %}Sekarang{% else %}{{ edu.end_date|date:"M Y" }}{% endif %}
+                                    </p>
+                                    {% if edu.description %}
+                                    <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed">{{ edu.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Timeline dot -->
+                            <div class="hidden md:flex z-10 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-indigo-600 items-center justify-center absolute left-1/2 transform -translate-x-1/2 md:order-1">
+                                <i class="fas fa-graduation-cap text-white text-lg lg:text-xl"></i>
+                            </div>
+                            <div class="w-full md:w-1/2 md:pl-8 lg:pl-16 md:order-3"></div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400">Tidak ada riwayat pendidikan yang tersedia.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-100 dark:bg-gray-800">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-4xl font-bold text-center mb-16 text-gradient" data-aos="fade-up">Keahlian Saya</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Technical Skills -->
+                    <div data-aos="fade-right" data-aos-duration="1200">
+                        <h3 class="text-2xl font-bold mb-8 text-gray-800 dark:text-gray-200">
+                            <i class="fas fa-code mr-3 text-indigo-600"></i>Keahlian Teknis
+                        </h3>
+                        {% if technical_skills %}
+                        <div class="space-y-6">
+                            {% for skill in technical_skills %}
+                            <div class="skill-item">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-gray-700 dark:text-gray-300 font-medium flex items-center">
+                                        {% if skill.icon %}<i class="{{ skill.icon }} mr-2 text-indigo-600"></i>{% endif %}
+                                        {{ skill.name }}
+                                    </span>
+                                    <span class="text-indigo-600 dark:text-indigo-400 font-semibold">{{ skill.proficiency }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                    <div class="skill-progress bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full" data-width="{{ skill.proficiency }}%" style="width: 0;"></div>
+                                </div>
+                                {% if skill.description %}
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ skill.description }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-gray-500 dark:text-gray-400">Belum ada data keahlian teknis.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Professional Skills -->
+                    <div data-aos="fade-left" data-aos-duration="1200">
+                        <h3 class="text-2xl font-bold mb-8 text-gray-800 dark:text-gray-200">
+                            <i class="fas fa-lightbulb mr-3 text-indigo-600"></i>Keahlian Profesional
+                        </h3>
+                        {% if professional_skills %}
+                        <div class="grid grid-cols-2 gap-8">
+                            {% for skill in professional_skills %}
+                            <div class="text-center">
+                                <div class="w-24 h-24 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-3xl mb-4 mx-auto">
+                                    <i class="{{ skill.icon|default:'fas fa-star' }}"></i>
+                                </div>
+                                <h4 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">{{ skill.name }}</h4>
+                                <div class="flex justify-center mb-2">
+                                    <div class="flex space-x-1">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= skill.proficiency %}
+                                                <i class="fas fa-star text-yellow-400"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-gray-300"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% if skill.description %}
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ skill.description }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-gray-500 dark:text-gray-400">Belum ada data keahlian profesional.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-4xl font-bold text-center mb-16 text-gradient" data-aos="fade-up">Proyek</h2>
+                
+                {% if projects %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for project in projects %}
+                    <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
+                        <img src="{{ project.featured_image.url }}" alt="{{ project.title }}" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">{{ project.title }}</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-4">{{ project.short_description }}</p>
+                            {% if project.tags.all %}
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                {% for tag in project.tags.all %}
+                                <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-semibold px-2.5 py-0.5 rounded">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <button class="view-project bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition duration-300 w-full" data-project="{{ project.id }}">
+                                Lihat Detail
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400">Tidak ada proyek yang tersedia.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gray-100 dark:bg-gray-800">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16 text-gradient" data-aos="fade-up">Pengalaman</h2>
+                {% if experiences %}
+                <div class="relative">
+                    <!-- Timeline Line - Hidden on mobile -->
+                    <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-indigo-500"></div>
+                    
+                    <!-- Timeline Items -->
+                    <div class="space-y-8 md:space-y-16">
+                        {% for exp in experiences %}
+                        <div class="flex flex-col md:flex-row items-center" data-aos="fade-up" data-aos-duration="800">
+                            {% if forloop.counter0|divisibleby:2 %}
+                            <div class="md:w-1/2 md:pr-16 mb-8 md:mb-0 md:text-right">
+                                <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                                    <h3 class="text-2xl font-bold mb-2 text-indigo-600 dark:text-indigo-400">{{ exp.title }}</h3>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-2">{{ exp.company }}</p>
+                                    <p class="text-gray-500 dark:text-gray-500">{{ exp.start_date.year }} - {% if exp.is_current %}Sekarang{% else %}{{ exp.end_date.year }}{% endif %}</p>
+                                    <p class="mt-4 text-gray-700 dark:text-gray-300">{{ exp.description|safe }}</p>
+                                </div>
+                            </div>
+                            <div class="z-10 w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center transform -translate-y-12 md:translate-y-0 md:absolute md:left-1/2 md:-ml-6">
+                                <i class="fas fa-briefcase text-white text-xl"></i>
+                            </div>
+                            <div class="md:w-1/2 md:pl-16 md:text-left"></div>
+                            {% else %}
+                            <div class="md:w-1/2 md:pr-16 mb-8 md:mb-0 md:text-right md:order-2">
+                                <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                                    <h3 class="text-2xl font-bold mb-2 text-indigo-600 dark:text-indigo-400">{{ exp.title }}</h3>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-2">{{ exp.company }}</p>
+                                    <p class="text-gray-500 dark:text-gray-500">{{ exp.start_date.year }} - {% if exp.is_current %}Sekarang{% else %}{{ exp.end_date.year }}{% endif %}</p>
+                                    <p class="mt-4 text-gray-700 dark:text-gray-300">{{ exp.description|safe }}</p>
+                                </div>
+                            </div>
+                            <div class="z-10 w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center transform -translate-y-12 md:translate-y-0 md:absolute md:left-1/2 md:-ml-6 md:order-1">
+                                <i class="fas fa-briefcase text-white text-xl"></i>
+                            </div>
+                            <div class="md:w-1/2 md:pl-16 md:text-left md:order-3"></div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400">Tidak ada riwayat pengalaman yang tersedia.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-4xl font-bold text-center mb-16 text-gradient" data-aos="fade-up">Testimoni</h2>
+                {% if testimonials %}
+                <div class="swiper-container mySwiper" data-aos="fade-up">
+                    <div class="swiper-wrapper">
+                        {% for testimonial in testimonials %}
+                        <div class="swiper-slide p-8 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg">
+                            <div class="flex flex-col items-center text-center">
+                                {% if testimonial.image %}
+                                <img src="{{ testimonial.image.url }}" alt="Client Avatar" class="w-24 h-24 rounded-full mb-4 object-cover">
+                                {% else %}
+                                <img src="https://placehold.co/100x100/6D28D9/ffffff?text={{ testimonial.name|slice:":1" }}" alt="Client Avatar" class="w-24 h-24 rounded-full mb-4 object-cover">
+                                {% endif %}
+                                <p class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4 italic">"{{ testimonial.content }}"</p>
+                                <h4 class="font-bold text-gray-800 dark:text-gray-200">{{ testimonial.name }}</h4>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">
+                                    {% if testimonial.position %}{{ testimonial.position }}{% endif %}{% if testimonial.company %} &bull; {{ testimonial.company }}{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400">Tidak ada testimoni yang tersedia.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Certificates Section -->
+        <section id="certificates" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-100 dark:bg-gray-800">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-4xl font-bold text-center mb-16 text-gradient" data-aos="fade-up">Sertifikat</h2>
+                
+                {% if certificates %}
+                <div class="swiper certificates-swiper">
+                    <div class="swiper-wrapper pb-10">
+                        {% for cert in certificates %}
+                        <div class="swiper-slide" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'1' }}00">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 h-full flex flex-col">
+                                <img src="{{ cert.image.url }}" alt="{{ cert.title }}" class="w-full h-48 object-cover">
+                                <div class="p-6 flex-grow">
+                                    <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">{{ cert.title }}</h3>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-4">{{ cert.organization }}</p>
+                                    <p class="text-gray-500 dark:text-gray-500 mb-4">Diterbitkan: {{ cert.issue_date|date:"F Y" }}</p>
+                                    <button class="view-certificate bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition duration-300 w-full mt-auto" data-certificate="{{ cert.id }}">
+                                        Lihat Sertifikat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <!-- Navigasi Swiper -->
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+                {% else %}
+                <p class="text-center text-gray-500 dark:text-gray-400">Tidak ada sertifikat yang tersedia.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Call to Action Section -->
+        <section id="cta" class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-custom text-white text-center">
+            <div class="container mx-auto max-w-7xl" data-aos="zoom-in" data-aos-duration="1000">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Tertarik untuk Bekerja Sama?</h2>
+                <p class="text-xl md:text-2xl mb-8 opacity-90">Mari kita wujudkan ide Anda menjadi kenyataan.</p>
+                <a href="#contact" class="inline-block bg-white text-indigo-600 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition duration-300 shadow-xl transform hover:scale-110 animate__animated animate__pulse animate__infinite">
+                    Mulai Proyek
+                </a>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-100 dark:bg-gray-800">
+            <div class="container mx-auto max-w-7xl">
+                <h2 class="text-4xl font-bold text-center mb-16 text-gradient" data-aos="fade-up">Kontak</h2>
+                
+                <div class="flex flex-col md:flex-row gap-10">
+                    <!-- Contact Info -->
+                    <div class="md:w-1/2" data-aos="fade-right" data-aos-duration="1200">
+                        <h3 class="text-2xl font-bold mb-8 text-gray-800 dark:text-gray-200">Informasi Kontak</h3>
+                        {% if profile and profile.contact %}
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt text-indigo-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">Lokasi</h4>
+                                    <p class="text-gray-600 dark:text-gray-400">{{ profile.contact.address }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-envelope text-indigo-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">Email</h4>
+                                    <p class="text-gray-600 dark:text-gray-400">{{ profile.contact.email }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-phone-alt text-indigo-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">Telepon</h4>
+                                    <p class="text-gray-600 dark:text-gray-400">{{ profile.contact.phone }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if profile.social_links.all %}
+                        <div class="mt-10">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Sosial Media</h4>
+                            <div class="flex space-x-4">
+                                {% for social in profile.social_links.all %}
+                                <a href="{{ social.url }}" aria-label="{{ social.platform }}" class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white hover:bg-indigo-700 transition duration-300">
+                                    <i class="fab fa-{{ social.platform }} text-xl"></i>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <p class="text-gray-500 dark:text-gray-400">Tidak ada informasi kontak yang tersedia.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Contact Form -->
+                    <div class="md:w-1/2" data-aos="fade-left" data-aos-duration="1200">
+                        <h3 class="text-2xl font-bold mb-8 text-gray-800 dark:text-gray-200">Kirim Pesan</h3>
+                        <form id="contact-form" class="space-y-6" action="{% url 'send_message' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama</label>
+                                    <input type="text" id="name" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" required>
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                    <input type="email" id="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" required>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subjek</label>
+                                <input type="text" id="subject" name="subject" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" required>
+                            </div>
+                            
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pesan</label>
+                                <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-gradient-custom text-white px-6 py-4 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg transform hover:scale-105 animate__animated animate__pulse animate__infinite">
+                                Kirim Pesan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Modals for Projects -->
+        {% for project in projects %}
+        <div id="project-modal-{{ project.id }}" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="p-6">
+                    <h2 class="text-3xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">{{ project.title }}</h2>
+                    <img src="{{ project.featured_image.url }}" alt="{{ project.title }}" class="w-full h-64 object-cover rounded-lg mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        {% if project.client %}
+                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Klien</h4>
+                            <p class="text-gray-600 dark:text-gray-400">{{ project.client }}</p>
+                        </div>
+                        {% endif %}
+                        {% if project.completion_date %}
+                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Tanggal</h4>
+                            <p class="text-gray-600 dark:text-gray-400">{{ project.completion_date|date:"F Y" }}</p>
+                        </div>
+                        {% endif %}
+                        {% if project.category %}
+                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Kategori</h4>
+                            <p class="text-gray-600 dark:text-gray-400">{{ project.get_category_display }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">Deskripsi Proyek</h3>
+                    <div class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-400">
+                        {{ project.description|safe }}
+                    </div>
+                    {% if project.tags.all %}
+                    <h3 class="text-xl font-bold mt-6 mb-3 text-gray-800 dark:text-gray-200">Teknologi</h3>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        {% for tag in project.tags.all %}
+                        <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-semibold px-3 py-1 rounded">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="flex space-x-4 mt-6">
+                        {% if project.demo_link %}
+                        <a href="{{ project.demo_link }}" target="_blank" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded hover:bg-indigo-700 transition duration-300">
+                            Lihat Demo
+                        </a>
+                        {% endif %}
+                        {% if project.source_link %}
+                        <a href="{{ project.source_link }}" target="_blank" class="inline-block border border-indigo-600 text-indigo-600 px-6 py-3 rounded hover:bg-indigo-600 hover:text-white transition duration-300">
+                            Kode Sumber
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Dynamic Modals for Certificates -->
+        {% for cert in certificates %}
+        <div id="certificate-modal-{{ cert.id }}" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="p-6">
+                    <h2 class="text-3xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">{{ cert.title }}</h2>
+                    <img src="{{ cert.image.url }}" alt="{{ cert.title }}" class="w-full h-auto object-cover rounded-lg mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Penerbit</h4>
+                            <p class="text-gray-600 dark:text-gray-400">{{ cert.organization }}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Tanggal</h4>
+                            <p class="text-gray-600 dark:text-gray-400">{{ cert.issue_date|date:"F Y" }}</p>
+                        </div>
+                        {% if cert.credential_id %}
+                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">ID Kredensial</h4>
+                            <p class="text-gray-600 dark:text-gray-400">{{ cert.credential_id }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if cert.description %}
+                    <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">Deskripsi</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">{{ cert.description }}</p>
+                    {% endif %}
+                    {% if cert.skills.all %}
+                    <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">Keterampilan</h3>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        {% for skill in cert.skills.all %}
+                        <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-semibold px-3 py-1 rounded">{{ skill.name }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if cert.credential_url %}
+                    <a href="{{ cert.credential_url }}" target="_blank" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded hover:bg-indigo-700 transition duration-300">
+                        Verifikasi Sertifikat
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 sm:py-12 dark:bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <!-- About Section -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-xl font-bold mb-4 text-gradient">Portfolio</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        {% if profile %}{{ profile.short_intro }}{% else %}Pengembang web yang berpengalaman dalam menciptakan solusi digital inovatif.{% endif %}
+                    </p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold mb-4 text-white">Tautan Cepat</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition duration-300 text-sm">Beranda</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition duration-300 text-sm">Tentang</a></li>
+                        <li><a href="#projects" class="text-gray-400 hover:text-white transition duration-300 text-sm">Proyek</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition duration-300 text-sm">Kontak</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="text-center md:text-right">
+                    <h3 class="text-lg font-semibold mb-4 text-white">Ikuti Saya</h3>
+                    <div class="flex justify-center md:justify-end space-x-4">
+                        {% if profile and profile.social_links.all %}
+                            {% for social in profile.social_links.all %}
+                            <a href="{{ social.url }}" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-600 flex items-center justify-center text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-{{ social.platform }}"></i>
+                            </a>
+                            {% endfor %}
+                        {% else %}
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-600 flex items-center justify-center text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-600 flex items-center justify-center text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-600 flex items-center justify-center text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="border-t border-gray-800 pt-6 text-center">
+                <p class="text-gray-400 text-sm">
+                    &copy; {% now "Y" %} {% if profile %}{{ profile.name }}{% else %}Portfolio{% endif %}. Semua hak dilindungi.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Buttons -->
+    <div class="fixed bottom-6 right-4 sm:right-6 flex flex-col space-y-3 z-40">
+        <!-- Back to Top -->
+        <button id="back-to-top" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg transition duration-300 transform hover:scale-110 opacity-0 invisible floating-btn" aria-label="Back to top">
+            <i class="fas fa-arrow-up text-sm sm:text-base"></i>
+        </button>
+        
+        <!-- Contact Email -->
+        <a href="#contact" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition duration-300 transform hover:scale-110 floating-btn" aria-label="Contact via email">
+            <i class="fas fa-envelope text-sm sm:text-base"></i>
+        </a>
+        
+        <!-- WhatsApp -->
+        {% if profile and profile.contact and profile.contact.phone %}
+        <a href="https://wa.me/{{ profile.contact.phone }}" target="_blank" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg transition duration-300 transform hover:scale-110 floating-btn" aria-label="Contact via WhatsApp">
+            <i class="fab fa-whatsapp text-sm sm:text-base"></i>
+        </a>
+        {% endif %}
+        
+        <!-- Dark Mode Toggle -->
+        <button id="theme-toggle" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-700 hover:bg-gray-800 text-white shadow-lg transition duration-300 transform hover:scale-110 floating-btn" aria-label="Toggle dark mode">
+            <i class="fas fa-moon text-sm sm:text-base"></i>
+        </button>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <!-- Typed.js -->
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- File JavaScript Kustom -->
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

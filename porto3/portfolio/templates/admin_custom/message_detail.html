@@ -1,0 +1,335 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}Detail Pesan - {{ message.subject }}{% endblock %}
+{% block page_title %}Detail Pesan{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <a href="{% url 'admin_custom:messages_list' %}" 
+               class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Kembali
+            </a>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Detail Pesan</h1>
+            {% if not message.is_read %}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                <i class="fas fa-circle text-xs mr-2"></i>Baru
+            </span>
+            {% endif %}
+        </div>
+        
+        <div class="flex space-x-3">
+            {% if not message.is_replied %}
+            <a href="{% url 'admin_custom:respond_message' message.id %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                <i class="fas fa-reply mr-2"></i>
+                Balas Pesan
+            </a>
+            {% endif %}
+            
+            <button onclick="deleteMessage()" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                <i class="fas fa-trash mr-2"></i>
+                Hapus
+            </button>
+        </div>
+    </div>
+    
+    <!-- Message Content -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <!-- Message Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-start justify-between">
+                <div class="flex items-start space-x-4">
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span class="text-2xl font-bold text-white">
+                                {{ message.name|first|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Sender Info -->
+                    <div class="flex-1">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                            {{ message.name }}
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-400 flex items-center mt-1">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <a href="mailto:{{ message.email }}" class="hover:text-indigo-600 dark:hover:text-indigo-400">
+                                {{ message.email }}
+                            </a>
+                        </p>
+                        <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            <span>
+                                <i class="fas fa-clock mr-1"></i>
+                                {{ message.created_at|date:"d M Y, H:i" }}
+                            </span>
+                            {% if message.ip_address %}
+                            <span>
+                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                {{ message.ip_address }}
+                            </span>
+                            {% endif %}
+                            {% if message.user_agent %}
+                            <span class="hidden md:inline">
+                                <i class="fas fa-desktop mr-1"></i>
+                                {{ message.user_agent|truncatechars:50 }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status Badges -->
+                <div class="flex flex-col space-y-2">
+                    {% if message.is_read %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                        <i class="fas fa-check mr-1"></i>Dibaca
+                    </span>
+                    {% endif %}
+                    
+                    {% if message.is_replied %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                        <i class="fas fa-reply mr-1"></i>Dibalas
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Subject -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                <i class="fas fa-tag mr-2 text-gray-500 dark:text-gray-400"></i>
+                {{ message.subject }}
+            </h3>
+        </div>
+        
+        <!-- Message Body -->
+        <div class="px-6 py-6">
+            <div class="prose dark:prose-invert max-w-none">
+                <div class="whitespace-pre-wrap text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {{ message.message }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Message Metadata -->
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                    <span class="font-medium text-gray-900 dark:text-gray-100">Diterima:</span>
+                    <span class="text-gray-600 dark:text-gray-400 ml-2">
+                        {{ message.created_at|timesince }} yang lalu
+                    </span>
+                </div>
+                
+                {% if message.ip_address %}
+                <div>
+                    <span class="font-medium text-gray-900 dark:text-gray-100">IP Address:</span>
+                    <span class="text-gray-600 dark:text-gray-400 ml-2 font-mono">
+                        {{ message.ip_address }}
+                    </span>
+                </div>
+                {% endif %}
+                
+                <div>
+                    <span class="font-medium text-gray-900 dark:text-gray-100">Status:</span>
+                    <span class="ml-2">
+                        {% if message.is_replied %}
+                        <span class="text-blue-600 dark:text-blue-400">Sudah Dibalas</span>
+                        {% elif message.is_read %}
+                        <span class="text-green-600 dark:text-green-400">Sudah Dibaca</span>
+                        {% else %}
+                        <span class="text-yellow-600 dark:text-yellow-400">Belum Dibaca</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            {% if message.user_agent %}
+            <div class="mt-4">
+                <span class="font-medium text-gray-900 dark:text-gray-100">User Agent:</span>
+                <div class="text-gray-600 dark:text-gray-400 mt-1 font-mono text-xs break-all">
+                    {{ message.user_agent }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Response History -->
+    {% if responses %}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                <i class="fas fa-history mr-2"></i>
+                Riwayat Balasan ({{ responses.count }})
+            </h3>
+        </div>
+        
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% for response in responses %}
+            <div class="px-6 py-4">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-indigo-600 dark:text-indigo-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900 dark:text-gray-100">Admin</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ response.created_at|date:"d M Y, H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                        Terkirim
+                    </span>
+                </div>
+                
+                <div class="ml-11">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                            {{ response.response_message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Quick Actions -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+            <i class="fas fa-bolt mr-2"></i>
+            Aksi Cepat
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button onclick="markAsRead()" 
+                    class="flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 {% if message.is_read %}opacity-50 cursor-not-allowed{% endif %}"
+                    {% if message.is_read %}disabled{% endif %}>
+                <i class="fas fa-check mr-2"></i>
+                {% if message.is_read %}Sudah Dibaca{% else %}Tandai Dibaca{% endif %}
+            </button>
+            
+            <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject }}&body=Halo {{ message.name }},%0D%0A%0D%0ATerima kasih atas pesan Anda.%0D%0A%0D%0ASalam,%0D%0AAdmin" 
+               class="flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Buka di Email
+            </a>
+            
+            <button onclick="copyToClipboard('{{ message.email }}')" 
+                    class="flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-copy mr-2"></i>
+                Salin Email
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900">
+                <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-xl"></i>
+            </div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mt-4">Hapus Pesan</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Apakah Anda yakin ingin menghapus pesan ini? Tindakan ini tidak dapat dibatalkan.
+                </p>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="confirmDelete" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-red-600">
+                    Hapus
+                </button>
+                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteMessage() {
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+
+document.getElementById('confirmDelete').addEventListener('click', function() {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "admin_custom:delete_message" message.id %}';
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+});
+
+function markAsRead() {
+    {% if not message.is_read %}
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "admin_custom:mark_message_read" message.id %}';
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    {% endif %}
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show success message
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+        toast.textContent = 'Email berhasil disalin!';
+        document.body.appendChild(toast);
+        
+        setTimeout(function() {
+            document.body.removeChild(toast);
+        }, 3000);
+    }).catch(function(err) {
+        console.error('Gagal menyalin: ', err);
+    });
+}
+
+// Auto mark as read when page loads
+{% if not message.is_read %}
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        markAsRead();
+    }, 2000); // Mark as read after 2 seconds
+});
+{% endif %}
+</script>
+{% endblock %}

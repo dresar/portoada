@@ -1,0 +1,396 @@
+{% extends 'custom_admin/layouts/base.html' %}
+
+{% block title %}Daftar Sertifikat{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+    <!-- Header -->
+    <div class="items-center justify-between lg:flex">
+        <div class="mb-4 lg:mb-0">
+            <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Daftar Sertifikat</h3>
+            <span class="text-base font-normal text-gray-500 dark:text-gray-400">Kelola semua sertifikat yang ditampilkan di portfolio Anda</span>
+        </div>
+        <div class="items-center sm:flex">
+            <form class="flex mb-4 sm:mb-0 sm:mr-4" method="get">
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="fas fa-search text-gray-500 dark:text-gray-400"></i>
+                    </div>
+                    <input type="text" name="search" value="{{ request.GET.search }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Cari sertifikat...">
+                </div>
+                <button type="submit" class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-primary-700 rounded-lg border border-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <i class="fas fa-search mr-2"></i>
+                    Cari
+                </button>
+            </form>
+            <div>
+                <button id="add-certificate-button" data-modal-target="certificate-modal" data-modal-url="{% url 'custom_admin:certificate_modal_create' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                    <i class="fas fa-plus mr-2"></i>Tambah Sertifikat
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+        <div class="flex flex-wrap gap-4">
+            <!-- Filter by Issuer -->
+            <div class="w-full md:w-auto">
+                <label for="filter-issuer" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Filter berdasarkan Penerbit</label>
+                <select id="filter-issuer" name="issuer" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" onchange="applyFilter('issuer', this.value)">
+                    <option value="">Semua Penerbit</option>
+                    {% for issuer in issuers %}
+                    <option value="{{ issuer }}" {% if request.GET.issuer == issuer %}selected{% endif %}>{{ issuer }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Filter by Status -->
+            <div class="w-full md:w-auto">
+                <label for="filter-status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Filter berdasarkan Status</label>
+                <select id="filter-status" name="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" onchange="applyFilter('status', this.value)">
+                    <option value="">Semua Status</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Aktif</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Tidak Aktif</option>
+                </select>
+            </div>
+            
+            <!-- Clear Filters -->
+            <div class="w-full md:w-auto flex items-end">
+                <button onclick="clearFilters()" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    <i class="fas fa-times mr-2"></i>Hapus Filter
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Table -->
+    <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-4 py-3">Nama</th>
+                    <th scope="col" class="px-4 py-3">Penerbit</th>
+                    <th scope="col" class="px-4 py-3">Tanggal</th>
+                    <th scope="col" class="px-4 py-3">Credential ID</th>
+                    <th scope="col" class="px-4 py-3">Status</th>
+                    <th scope="col" class="px-4 py-3">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for certificate in certificates %}
+                <tr class="border-b dark:border-gray-700">
+                    <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {{ certificate.name }}
+                    </td>
+                    <td class="px-4 py-3">
+                        {{ certificate.issuer }}
+                    </td>
+                    <td class="px-4 py-3">
+                        {{ certificate.date|date:"d M Y" }}
+                    </td>
+                    <td class="px-4 py-3">
+                        {% if certificate.credential_id %}
+                        {{ certificate.credential_id }}
+                        {% else %}
+                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center">
+                            <div class="h-2.5 w-2.5 rounded-full {% if certificate.is_active %}bg-green-500{% else %}bg-gray-500{% endif %} mr-2"></div>
+                            {% if certificate.is_active %}
+                            <span>Aktif</span>
+                            {% else %}
+                            <span>Tidak Aktif</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center space-x-2">
+                            <button type="button" class="edit-certificate-button text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800" data-modal-target="certificate-modal" data-modal-url="{% url 'custom_admin:certificate_modal_edit' certificate.id %}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            
+                            <button type="button" class="toggle-status-button text-white {% if certificate.is_active %}bg-yellow-600 hover:bg-yellow-700{% else %}bg-green-600 hover:bg-green-700{% endif %} focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-xs px-3 py-1.5 focus:outline-none dark:focus:ring-yellow-800" data-id="{{ certificate.id }}" data-url="{% url 'custom_admin:certificate_toggle_status' certificate.id %}">
+                                {% if certificate.is_active %}
+                                <i class="fas fa-eye-slash" title="Nonaktifkan"></i>
+                                {% else %}
+                                <i class="fas fa-eye" title="Aktifkan"></i>
+                                {% endif %}
+                            </button>
+                            
+                            <button type="button" class="delete-button text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800" data-id="{{ certificate.id }}" data-url="{% url 'custom_admin:certificate_ajax_delete' certificate.id %}" data-name="{{ certificate.name }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr class="border-b dark:border-gray-700">
+                    <td colspan="6" class="px-4 py-3 text-center">
+                        <div class="flex flex-col items-center justify-center py-5">
+                            <i class="fas fa-certificate text-gray-400 dark:text-gray-500 text-4xl mb-3"></i>
+                            <p class="text-gray-500 dark:text-gray-400 text-lg font-medium">Belum ada sertifikat</p>
+                            <p class="text-gray-500 dark:text-gray-400 mb-4">Tambahkan sertifikat pertama Anda untuk ditampilkan di portfolio</p>
+                            <button id="empty-add-certificate-button" data-modal-target="certificate-modal" data-modal-url="{% url 'custom_admin:certificate_modal_create' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                                <i class="fas fa-plus mr-2"></i>Tambah Sertifikat
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if certificates.has_other_pages %}
+    <div class="flex flex-col md:flex-row justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="mb-4 md:mb-0">
+            <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                Menampilkan <span class="font-semibold text-gray-900 dark:text-white">{{ certificates.start_index }}</span> - 
+                <span class="font-semibold text-gray-900 dark:text-white">{{ certificates.end_index }}</span> dari
+                <span class="font-semibold text-gray-900 dark:text-white">{{ certificates.paginator.count }}</span> sertifikat
+            </p>
+        </div>
+        <nav class="inline-flex">
+            <ul class="inline-flex items-center -space-x-px">
+                {% if certificates.has_previous %}
+                <li>
+                    <a href="?page={{ certificates.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.issuer %}&issuer={{ request.GET.issuer }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for i in certificates.paginator.page_range %}
+                    {% if certificates.number == i %}
+                    <li>
+                        <a href="#" aria-current="page" class="z-10 px-3 py-2 leading-tight text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">{{ i }}</a>
+                    </li>
+                    {% elif i > certificates.number|add:'-3' and i < certificates.number|add:'3' %}
+                    <li>
+                        <a href="?page={{ i }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.issuer %}&issuer={{ request.GET.issuer }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if certificates.has_next %}
+                <li>
+                    <a href="?page={{ certificates.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.issuer %}&issuer={{ request.GET.issuer }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Certificate Modal -->
+<div id="certificate-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
+            <!-- Modal body will be loaded via AJAX -->
+            <div id="certificate-modal-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="delete-modal">
+                <i class="fas fa-times"></i>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="p-6 text-center">
+                <i class="fas fa-exclamation-circle mx-auto mb-4 text-gray-400 w-12 h-12 text-3xl dark:text-gray-200"></i>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Apakah Anda yakin ingin menghapus sertifikat <span id="delete-item-name" class="font-medium text-gray-800 dark:text-gray-300"></span>?</h3>
+                <p class="mb-5 text-sm text-gray-500 dark:text-gray-400">Tindakan ini tidak dapat dibatalkan dan akan menghapus sertifikat secara permanen dari sistem.</p>
+                <button id="confirm-delete-button" data-id="" data-url="" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                    <i class="fas fa-trash-alt mr-2"></i>Ya, hapus
+                </button>
+                <button data-modal-hide="delete-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                    <i class="fas fa-times mr-2"></i>Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Filter functions
+    function applyFilter(filterName, value) {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (value) {
+            urlParams.set(filterName, value);
+        } else {
+            urlParams.delete(filterName);
+        }
+        
+        // Reset to page 1 when filtering
+        urlParams.delete('page');
+        
+        window.location.search = urlParams.toString();
+    }
+    
+    function clearFilters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Keep only search parameter if exists
+        const searchParam = urlParams.get('search');
+        urlParams.delete('issuer');
+        urlParams.delete('status');
+        urlParams.delete('page');
+        
+        if (searchParam) {
+            urlParams.set('search', searchParam);
+        }
+        
+        window.location.search = urlParams.toString();
+    }
+    
+    // Modal handling
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Certificate button
+        const addButtons = document.querySelectorAll('#add-certificate-button, #empty-add-certificate-button');
+        addButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const modalUrl = this.getAttribute('data-modal-url');
+                loadModal(modalUrl);
+            });
+        });
+        
+        // Edit Certificate buttons
+        const editButtons = document.querySelectorAll('.edit-certificate-button');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const modalUrl = this.getAttribute('data-modal-url');
+                loadModal(modalUrl);
+            });
+        });
+        
+        // Toggle Status buttons
+        const toggleStatusButtons = document.querySelectorAll('.toggle-status-button');
+        toggleStatusButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                const id = this.getAttribute('data-id');
+                toggleStatus(url, id);
+            });
+        });
+        
+        // Delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const url = this.getAttribute('data-url');
+                const name = this.getAttribute('data-name');
+                showDeleteConfirmation(id, url, name);
+            });
+        });
+    });
+    
+    // Load modal content via AJAX
+    function loadModal(url) {
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('certificate-modal-content').innerHTML = html;
+            openModal('certificate-modal');
+        })
+        .catch(error => {
+            console.error('Error loading modal:', error);
+            showToast('error', 'Gagal memuat form. Silakan coba lagi.');
+        });
+    }
+    
+    // Toggle certificate status
+    function toggleStatus(url, id) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast('success', data.message);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast('error', data.message || 'Terjadi kesalahan. Silakan coba lagi.');
+            }
+        })
+        .catch(error => {
+            console.error('Error toggling status:', error);
+            showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        });
+    }
+    
+    // Show delete confirmation modal
+    function showDeleteConfirmation(id, url, name) {
+        document.getElementById('delete-item-name').textContent = name;
+        const confirmButton = document.getElementById('confirm-delete-button');
+        confirmButton.setAttribute('data-id', id);
+        confirmButton.setAttribute('data-url', url);
+        openModal('delete-modal');
+        
+        // Add event listener to confirm button
+        confirmButton.addEventListener('click', function() {
+            deleteItem(this.getAttribute('data-url'), this.getAttribute('data-id'));
+        }, { once: true }); // Use once: true to prevent multiple event listeners
+    }
+    
+    // Delete certificate
+    function deleteItem(url, id) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            closeModal('delete-modal');
+            
+            if (data.status === 'success') {
+                showToast('success', data.message);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast('error', data.message || 'Terjadi kesalahan. Silakan coba lagi.');
+            }
+        })
+        .catch(error => {
+            closeModal('delete-modal');
+            console.error('Error deleting item:', error);
+            showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        });
+    }
+</script>
+{% endblock %}
